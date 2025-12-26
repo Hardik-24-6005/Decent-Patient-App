@@ -1,10 +1,9 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth.dart';
 import '../../home/models/http_exception.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -66,7 +65,7 @@ class AuthScreen extends StatelessWidget {
 
 class AuthCard extends StatefulWidget {
   const AuthCard({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -87,11 +86,11 @@ class _AuthCardState extends State<AuthCard> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: Text(AppLocalizations.of(context).anErrorHasOccurred),
+        title: Text(AppLocalizations.of(context)!.anErrorHasOccurred),
         content: Text(message),
         actions: <Widget>[
-          FlatButton(
-              child: Text(AppLocalizations.of(context).ok),
+          TextButton(
+              child: Text(AppLocalizations.of(context)!.ok),
               onPressed: () {
                 Navigator.of(ctx).pop();
               }),
@@ -101,11 +100,11 @@ class _AuthCardState extends State<AuthCard> {
   }
 
   Future<void> _submit() async {
-    if (!_formKey.currentState.validate()) {
+    if (!_formKey.currentState!.validate()) {
       // Invalid!
       return;
     }
-    _formKey.currentState.save();
+    _formKey.currentState!.save();
     setState(() {
       _isLoading = true;
     });
@@ -114,34 +113,34 @@ class _AuthCardState extends State<AuthCard> {
       if (_authMode == AuthMode.Login) {
         // Log user in
         await Provider.of<Auth>(context, listen: false).login(
-          _authData['email'],
-          _authData['password'],
+          _authData['email']!,
+          _authData['password']!,
         );
       } else {
         // Sign user up
         await Provider.of<Auth>(context, listen: false).signup(
-          _authData['email'],
-          _authData['password'],
+          _authData['email']!,
+          _authData['password']!,
         );
       }
       Navigator.of(context).pushReplacementNamed('/');
     } on HttpException catch (error) {
-      var errorMessage = AppLocalizations.of(context).authenticationFailed;
+      var errorMessage = AppLocalizations.of(context)!.authenticationFailed;
       if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage = AppLocalizations.of(context).theEmailIsAlreadyInUse;
+        errorMessage = AppLocalizations.of(context)!.theEmailIsAlreadyInUse;
       } else if (error.toString().contains('INVALID_EMAIL')) {
-        errorMessage = AppLocalizations.of(context).thisIsNotAValidEmailAddress;
+        errorMessage = AppLocalizations.of(context)!.thisIsNotAValidEmailAddress;
       } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = AppLocalizations.of(context).passwordIsTooWeak;
+        errorMessage = AppLocalizations.of(context)!.passwordIsTooWeak;
       } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = AppLocalizations.of(context).couldNotFindTheEmailAddress;
+        errorMessage = AppLocalizations.of(context)!.couldNotFindTheEmailAddress;
       } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = AppLocalizations.of(context).invalidPassword;
+        errorMessage = AppLocalizations.of(context)!.invalidPassword;
       }
       _showErrorDialog(errorMessage);
     } catch (error) {
       var errorMessage =
-          AppLocalizations.of(context).couldNotAuthenticateYouPleasetryagain;
+          AppLocalizations.of(context)!.couldNotAuthenticateYouPleasetryagain;
 
       _showErrorDialog(errorMessage);
     }
@@ -151,17 +150,17 @@ class _AuthCardState extends State<AuthCard> {
     });
   }
 
-  void _switchAuthMode() {
-    if (_authMode == AuthMode.Login) {
-      setState(() {
-        _authMode = AuthMode.Signup;
-      });
-    } else {
-      setState(() {
-        _authMode = AuthMode.Login;
-      });
-    }
-  }
+  // void _switchAuthMode() {
+  //   if (_authMode == AuthMode.Login) {
+  //     setState(() {
+  //       _authMode = AuthMode.Signup;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       _authMode = AuthMode.Login;
+  //     });
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -184,19 +183,18 @@ class _AuthCardState extends State<AuthCard> {
                   padding: EdgeInsets.only(left: 15, right: 15),
                   child: TextFormField(
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context).email,
+                      labelText: AppLocalizations.of(context)!.email,
                       border: InputBorder.none,
                     ),
                     keyboardType: TextInputType.emailAddress,
                     validator: (value) {
-                      if (value.isEmpty || !value.contains('@')) {
-                        return AppLocalizations.of(context).invalidEmail;
+                      if (value!.isEmpty || !value.contains('@')) {
+                        return AppLocalizations.of(context)!.invalidEmail;
                       }
-                      return null;
                       return null;
                     },
                     onSaved: (value) {
-                      _authData['email'] = value;
+                      _authData['email'] = value!;
                     },
                   ),
                 ),
@@ -210,19 +208,19 @@ class _AuthCardState extends State<AuthCard> {
                   padding: EdgeInsets.only(left: 15, right: 15),
                   child: TextFormField(
                     decoration: InputDecoration(
-                      labelText: AppLocalizations.of(context).password,
+                      labelText: AppLocalizations.of(context)!.password,
                       border: InputBorder.none,
                     ),
                     obscureText: true,
                     controller: _passwordController,
                     validator: (value) {
-                      if (value.isEmpty || value.length < 5) {
-                        return AppLocalizations.of(context).invalidPassword;
+                      if (value!.isEmpty || value.length < 5) {
+                        return AppLocalizations.of(context)!.invalidPassword;
                       }
                       return null;
                     },
                     onSaved: (value) {
-                      _authData['password'] = value;
+                      _authData['password'] = value!;
                     },
                   ),
                 ),
@@ -231,12 +229,12 @@ class _AuthCardState extends State<AuthCard> {
                     enabled: _authMode == AuthMode.Signup,
                     decoration: InputDecoration(
                         labelText:
-                            AppLocalizations.of(context).confirmPassword),
+                            AppLocalizations.of(context)!.confirmPassword),
                     obscureText: true,
                     validator: _authMode == AuthMode.Signup
                         ? (value) {
                             if (value != _passwordController.text) {
-                              return AppLocalizations.of(context)
+                              return AppLocalizations.of(context)!
                                   .passwordDoNotMatch;
                             }
                             return null;
@@ -249,18 +247,21 @@ class _AuthCardState extends State<AuthCard> {
                 if (_isLoading)
                   CircularProgressIndicator()
                 else
-                  RaisedButton(
+                  ElevatedButton(
                     child: Text(_authMode == AuthMode.Login
-                        ? AppLocalizations.of(context).login
-                        : AppLocalizations.of(context).signup),
+                        ? AppLocalizations.of(context)!.login
+                        : AppLocalizations.of(context)!.signup),
                     onPressed: _submit,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
+                      backgroundColor: Theme.of(context).primaryColor,
+                      foregroundColor:
+                          Theme.of(context).primaryTextTheme.labelLarge!.color,
                     ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0),
-                    color: Theme.of(context).primaryColor,
-                    textColor: Theme.of(context).primaryTextTheme.button.color,
                   ),
               ],
             ),

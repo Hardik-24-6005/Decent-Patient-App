@@ -23,12 +23,12 @@ import '../patient/todaysappointment.dart';
 import '../profile/changePassword.dart';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class DepartmentDetails {
-  final String id;
-  final String name;
-  final String description;
+  final String? id;
+  final String? name;
+  final String? description;
 
   DepartmentDetails({
     this.id,
@@ -40,20 +40,16 @@ class DepartmentDetails {
 class DoctorDepartmentScreen extends StatefulWidget {
   static const routeName = '/doctordepartment';
 
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
   DoctorDepartmentScreen(this.idd, this.useridd);
 
   @override
-  DoctorDepartmentScreenState createState() =>
-      DoctorDepartmentScreenState(this.idd, this.useridd);
+  DoctorDepartmentScreenState createState() => DoctorDepartmentScreenState();
 }
 
 class DoctorDepartmentScreenState extends State<DoctorDepartmentScreen> {
-  String idd;
-  String useridd;
-  DoctorDepartmentScreenState(this.idd, this.useridd);
-  int len;
+  int? len;
   List<DepartmentDetails> _departmentdata = [];
   List<DepartmentDetails> _tempdepartment = [];
   bool erroralllistdata = true;
@@ -66,7 +62,7 @@ class DoctorDepartmentScreenState extends State<DoctorDepartmentScreen> {
     var data = await http.post(
       Uri.parse(url),
       body: {
-        'ion_id': this.useridd,
+        'ion_id': widget.useridd,
       },
     );
 
@@ -105,9 +101,10 @@ class DoctorDepartmentScreenState extends State<DoctorDepartmentScreen> {
         _tempdepartment = _departmentdata;
       } else {
         for (var item in _departmentdata) {
-          if (item.name
-              .toLowerCase()
-              .contains(department.toString().toLowerCase())) {
+          if (item.name != null &&
+              item.name!
+                  .toLowerCase()
+                  .contains(department.toString().toLowerCase())) {
             _tempdepartment.add(item);
           }
         }
@@ -122,7 +119,7 @@ class DoctorDepartmentScreenState extends State<DoctorDepartmentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).department,
+          AppLocalizations.of(context)!.department,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -163,8 +160,8 @@ class DoctorDepartmentScreenState extends State<DoctorDepartmentScreen> {
                   controller: _searchdepartment,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    labelText: AppLocalizations.of(context).searchdepartment,
-                    hintText: AppLocalizations.of(context).department,
+                    labelText: AppLocalizations.of(context)!.searchdepartment,
+                    hintText: AppLocalizations.of(context)!.department,
                     prefixIcon: Padding(
                       padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
                       child: Icon(Icons.search),
@@ -187,7 +184,7 @@ class DoctorDepartmentScreenState extends State<DoctorDepartmentScreen> {
                   ? Container(
                       height: MediaQuery.of(context).size.height * .5,
                       child: Center(
-                        child: Text(AppLocalizations.of(context).nodatatoshow),
+                        child: Text(AppLocalizations.of(context)!.nodatatoshow),
                       ),
                     )
                   : Container(
@@ -211,8 +208,8 @@ class DoctorDepartmentScreenState extends State<DoctorDepartmentScreen> {
                               padding: EdgeInsets.all(10),
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                  primary: Colors.white,
-                                  onPrimary: Colors.black,
+                                  backgroundColor: Colors.white,
+                                  foregroundColor: Colors.black,
                                   shadowColor: Color.fromRGBO(0, 0, 0, .5),
                                   elevation: 5,
                                 ),
@@ -244,7 +241,7 @@ class DoctorDepartmentScreenState extends State<DoctorDepartmentScreen> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) =>
-                                              DoctorListScreen(idd, useridd,
+                                              DoctorListScreen(widget.idd, widget.useridd,
                                                   departmentname:
                                                       _tempdepartment[index]
                                                           .id)));

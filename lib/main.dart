@@ -37,7 +37,7 @@ import 'profile/changePassword.dart';
 
 import 'package:hmz_patient/l10n/l10n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(
@@ -46,11 +46,11 @@ void main() {
     ),
   );
 
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  String appointmentid;
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -70,9 +70,10 @@ class MyApp extends StatelessWidget {
           title: 'Patient Express',
           theme: ThemeData(
             primarySwatch: Colors.blue,
-            scaffoldBackgroundColor: Color(0xffbfafafa),
+            scaffoldBackgroundColor: Color(0xfffafafa),
             //  scaffoldBackgroundColor: Colors.black,
-            accentColor: Colors.blue,
+            colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue)
+                .copyWith(secondary: Colors.blue),
             fontFamily: 'Proxima Nova',
           ),
           locale: langProvider.locale,
@@ -84,7 +85,7 @@ class MyApp extends StatelessWidget {
             GlobalCupertinoLocalizations.delegate,
           ],
           home: auth.isAuth
-              ? DashboardScreen(auth.particularId, auth.userId)
+              ? DashboardScreen(auth.particularId!, auth.userId!)
               : FutureBuilder(
                   future: auth.tryAutoLogin(),
                   builder: (ctx, authResultSnapshot) =>
@@ -95,49 +96,49 @@ class MyApp extends StatelessWidget {
                 ),
           routes: {
             DashboardScreen.routeName: (ctx) =>
-                DashboardScreen(auth.particularId, auth.userId),
-            Profile.routeName: (ctx) => Profile(auth.particularId, auth.userId),
+                DashboardScreen(auth.particularId!, auth.userId!),
+            Profile.routeName: (ctx) => Profile(auth.particularId!, auth.userId!),
             FullProfile.routeName: (ctx) =>
-                FullProfile(auth.particularId, auth.userId),
+                FullProfile(auth.particularId!, auth.userId!),
             EditProfile.routeName: (ctx) =>
-                EditProfile(auth.particularId, auth.userId),
+                EditProfile(auth.particularId!, auth.userId!),
             PrescriptionDetailScreen.routeName: (ctx) =>
-                PrescriptionDetailScreen(auth.particularId, auth.userId),
+                PrescriptionDetailScreen(auth.particularId!, auth.userId!),
             Jitsi.routeName: (ctx) => Jitsi(),
             AddPaymentScreen.routeName: (ctx) =>
-                AddPaymentScreen(auth.particularId),
-            ShowPayment.routeName: (ctx) => ShowPayment(auth.particularId),
+                AddPaymentScreen(auth.particularId!),
+            ShowPayment.routeName: (ctx) => ShowPayment(auth.particularId!),
             AllInvoicePayment.routeName: (ctx) =>
-                AllInvoicePayment(auth.particularId, auth.userId),
+                AllInvoicePayment(auth.particularId!, auth.userId!),
             DepositPayment.routeName: (ctx) =>
-                DepositPayment(auth.particularId, auth.userId),
+                DepositPayment(auth.particularId!, auth.userId!),
             PatientAppointmentDetailsScreen.routeName: (ctx) =>
-                PatientAppointmentDetailsScreen(auth.particularId, auth.userId),
+                PatientAppointmentDetailsScreen(auth.particularId!, auth.userId!),
             ShowPatientAppointmentScreen.routeName: (ctx) =>
-                ShowPatientAppointmentScreen(auth.particularId, auth.userId),
+                ShowPatientAppointmentScreen(auth.particularId!, auth.userId!),
             ShowTodaysAppointmentScreen.routeName: (ctx) =>
-                ShowTodaysAppointmentScreen(auth.particularId),
+                ShowTodaysAppointmentScreen(auth.particularId!),
             UserPrescriptionsScreen.routeName: (ctx) =>
-                UserPrescriptionsScreen(auth.particularId, auth.userId),
+                UserPrescriptionsScreen(auth.particularId!, auth.userId!),
             AuthScreen.routeName: (ctx) => AuthScreen(),
             SettingScreen.routeName: (ctx) =>
-                SettingScreen(auth.particularId, auth.userId),
+                SettingScreen(auth.particularId!, auth.userId!),
             DoctorDepartmentScreen.routeName: (ctx) =>
-                DoctorDepartmentScreen(auth.particularId, auth.userId),
+                DoctorDepartmentScreen(auth.particularId!, auth.userId!),
             DoctorDetailProfile.routeName: (ctx) =>
-                DoctorDetailProfile(auth.particularId, auth.userId),
+                DoctorDetailProfile(auth.particularId!, auth.userId!),
             DoctorListScreen.routeName: (ctx) =>
-                DoctorListScreen(auth.particularId, auth.userId),
+                DoctorListScreen(auth.particularId!, auth.userId!),
             AppointmentFromDoctorScreen.routeName: (ctx) =>
-                AppointmentFromDoctorScreen(auth.particularId, auth.userId),
+                AppointmentFromDoctorScreen(auth.particularId!, auth.userId!),
             LabDetailScreen.routeName: (ctx) =>
-                LabDetailScreen(auth.particularId, auth.userId),
+                LabDetailScreen(auth.particularId!, auth.userId!),
             LabListScreen.routeName: (ctx) =>
-                LabListScreen(auth.particularId, auth.userId),
+                LabListScreen(auth.particularId!, auth.userId!),
             CaseList.routeName: (ctx) =>
-                CaseList(auth.particularId, auth.userId),
+                CaseList(auth.particularId!, auth.userId!),
             DocumentList.routeName: (ctx) =>
-                DocumentList(auth.particularId, auth.userId),
+                DocumentList(auth.particularId!, auth.userId!),
           },
         );
       }),

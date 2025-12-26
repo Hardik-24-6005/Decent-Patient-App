@@ -22,7 +22,7 @@ import '../../payment/showPayment.dart';
 import '../../dashboard/dashboard.dart';
 import '../../profile/changePassword.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 import 'package:hmz_patient/case/screens/case.dart';
 import 'package:hmz_patient/document/screens/document.dart';
@@ -45,7 +45,7 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(
                 Icons.dashboard,
               ),
-              title: Text(AppLocalizations.of(context).dashboard),
+              title: Text(AppLocalizations.of(context)!.dashboard),
               onTap: () {
                 Navigator.of(context)
                     .pushReplacementNamed(DashboardScreen.routeName);
@@ -62,7 +62,7 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(
                   Icons.list,
                 ),
-                title: Text(AppLocalizations.of(context).appointment),
+                title: Text(AppLocalizations.of(context)!.appointment),
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(left: 20),
@@ -71,7 +71,7 @@ class AppDrawer extends StatelessWidget {
                         Icons.add_circle_outline,
                       ),
                       title:
-                          Text(AppLocalizations.of(context).appointmentRequest),
+                          Text(AppLocalizations.of(context)!.appointmentRequest),
                       onTap: () {
                         Navigator.of(context).pushReplacementNamed(
                             PatientAppointmentDetailsScreen.routeName);
@@ -85,7 +85,7 @@ class AppDrawer extends StatelessWidget {
                         Icons.today,
                       ),
                       title:
-                          Text(AppLocalizations.of(context).todaysAppointment),
+                          Text(AppLocalizations.of(context)!.todaysAppointment),
                       onTap: () {
                         Navigator.of(context).pushReplacementNamed(
                             ShowTodaysAppointmentScreen.routeName);
@@ -98,7 +98,7 @@ class AppDrawer extends StatelessWidget {
                       leading: Icon(
                         Icons.list,
                       ),
-                      title: Text(AppLocalizations.of(context).appointmentList),
+                      title: Text(AppLocalizations.of(context)!.appointmentList),
                       onTap: () {
                         Navigator.of(context).pushReplacementNamed(
                             ShowPatientAppointmentScreen.routeName);
@@ -115,7 +115,7 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(
                 Icons.file_copy,
               ),
-              title: Text(AppLocalizations.of(context).case_history),
+              title: Text(AppLocalizations.of(context)!.case_history),
               onTap: () {
                 Navigator.of(context).pushReplacementNamed(CaseList.routeName);
               },
@@ -127,7 +127,7 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(
                 Icons.file_copy,
               ),
-              title: Text(AppLocalizations.of(context).documents),
+              title: Text(AppLocalizations.of(context)!.documents),
               onTap: () {
                 Navigator.of(context)
                     .pushReplacementNamed(DocumentList.routeName);
@@ -140,7 +140,7 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(
                 Icons.file_copy,
               ),
-              title: Text(AppLocalizations.of(context).prescription),
+              title: Text(AppLocalizations.of(context)!.prescription),
               onTap: () {
                 Navigator.of(context)
                     .pushReplacementNamed(UserPrescriptionsScreen.routeName);
@@ -157,7 +157,7 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(
                   Icons.payment,
                 ),
-                title: Text(AppLocalizations.of(context).payment),
+                title: Text(AppLocalizations.of(context)!.payment),
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(left: 20),
@@ -165,7 +165,7 @@ class AppDrawer extends StatelessWidget {
                       leading: Icon(
                         Icons.payment,
                       ),
-                      title: Text(AppLocalizations.of(context).addPayment),
+                      title: Text(AppLocalizations.of(context)!.addPayment),
                       onTap: () {
                         Navigator.of(context)
                             .pushReplacementNamed(AddPaymentScreen.routeName);
@@ -178,7 +178,7 @@ class AppDrawer extends StatelessWidget {
                       leading: Icon(
                         Icons.payments_outlined,
                       ),
-                      title: Text(AppLocalizations.of(context).allInvoices),
+                      title: Text(AppLocalizations.of(context)!.allInvoices),
                       onTap: () {
                         Navigator.of(context)
                             .pushReplacementNamed(AllInvoicePayment.routeName);
@@ -189,7 +189,7 @@ class AppDrawer extends StatelessWidget {
                     padding: const EdgeInsets.only(left: 20),
                     child: ListTile(
                       leading: Icon(Icons.payments_outlined),
-                      title: Text(AppLocalizations.of(context).deposit),
+                      title: Text(AppLocalizations.of(context)!.deposit),
                       onTap: () {
                         Navigator.of(context)
                             .pushReplacementNamed(DepositPayment.routeName);
@@ -209,13 +209,13 @@ class AppDrawer extends StatelessWidget {
                 leading: Icon(
                   Icons.search,
                 ),
-                title: Text(AppLocalizations.of(context).doctorsearch),
+                title: Text(AppLocalizations.of(context)!.doctorsearch),
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.only(left: 20),
                     child: ListTile(
                       leading: Icon(Icons.add_business_rounded),
-                      title: Text(AppLocalizations.of(context).department),
+                      title: Text(AppLocalizations.of(context)!.department),
                       onTap: () {
                         Navigator.of(context).pushReplacementNamed(
                             DoctorDepartmentScreen.routeName);
@@ -232,7 +232,7 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(
                 Icons.person,
               ),
-              title: Text(AppLocalizations.of(context).profile),
+              title: Text(AppLocalizations.of(context)!.profile),
               onTap: () {
                 Navigator.of(context)
                     .pushReplacementNamed(FullProfile.routeName);
@@ -245,7 +245,7 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(
                 Icons.settings,
               ),
-              title: Text(AppLocalizations.of(context).setting),
+              title: Text(AppLocalizations.of(context)!.setting),
               onTap: () {
                 Navigator.of(context)
                     .pushReplacementNamed(SettingScreen.routeName);
@@ -258,7 +258,7 @@ class AppDrawer extends StatelessWidget {
               leading: Icon(
                 Icons.exit_to_app,
               ),
-              title: Text(AppLocalizations.of(context).logout),
+              title: Text(AppLocalizations.of(context)!.logout),
               onTap: () {
                 Navigator.of(context).pop();
                 Navigator.of(context).pushReplacementNamed('/');

@@ -1,89 +1,39 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/auth/providers/auth.dart';
-import 'package:hmz_patient/dashboard/dashboard.dart';
 import 'package:hmz_patient/lab/screens/user_labs_screen.dart';
 import 'package:hmz_patient/utils/colors.dart';
-import 'package:provider/provider.dart';
 import 'package:flutter_html/flutter_html.dart';
 
-import 'dart:io';
 import 'package:http/http.dart' as http;
 
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-class LabDetailsSingle {
-  final String id;
-  final String patient_name;
-  final String patient_id;
-  final String doctor_name;
-  final String date;
-  final String report;
-  final String test_name;
-  final String test_status;
-  final String status;
-  final String age;
-  final String gender;
-  final String hospital_title;
-  final String hospital_address;
-  final String hospital_phone;
-
-  LabDetailsSingle({
-    this.id,
-    this.patient_name,
-    this.patient_id,
-    this.doctor_name,
-    this.date,
-    this.report,
-    this.test_name,
-    this.test_status,
-    this.status,
-    this.age,
-    this.gender,
-    this.hospital_title,
-    this.hospital_address,
-    this.hospital_phone,
-  });
-}
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class LabDetailScreen extends StatefulWidget {
   static const routeName = '/lab-detail';
-  var labid;
-  String idd;
-  String useridd;
+  final String? labid;
+  final String idd;
+  final String useridd;
 
-  LabDetailScreen(this.idd, this.useridd, {this.labid});
+  const LabDetailScreen(this.idd, this.useridd, {super.key, this.labid});
 
   @override
-  _LabDetailScreenState createState() =>
-      _LabDetailScreenState(this.idd, this.useridd, this.labid);
+  _LabDetailScreenState createState() => _LabDetailScreenState();
 }
 
 class _LabDetailScreenState extends State<LabDetailScreen> {
-  var labid;
-  String idd;
-  String useridd;
-
-  Future<LabDetails> labDetails;
-
-  _LabDetailScreenState(this.idd, this.useridd, this.labid);
 
   Future<LabDetails> _responseFuture() async {
-    // var data = await http.get(Uri.parse(Auth().linkURL +
-    //     "api/viewLab?id=${labid}&user_ion_id=" +
-    //     useridd));
-
     final url = Auth().linkURL + "api/getLabReportDetails";
 
     try {
       final data = await http.post(
         Uri.parse(url),
         body: {
-          'id': labid,
-          'user_ion_id': useridd,
+          'id': widget.labid,
+          'user_ion_id': widget.useridd,
         },
       );
 
@@ -141,7 +91,7 @@ class _LabDetailScreenState extends State<LabDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).labReport,
+          AppLocalizations.of(context)!.labReport,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -198,14 +148,14 @@ class _LabDetailScreenState extends State<LabDetailScreen> {
                         children: [
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).date}: ${response.data.date}"),
+                                "${AppLocalizations.of(context)!.date}: ${response.data.date}"),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).labId}: ${response.data.id}"),
+                                "${AppLocalizations.of(context)!.labId}: ${response.data.id}"),
                           ),
                         ],
                       ),
@@ -218,14 +168,14 @@ class _LabDetailScreenState extends State<LabDetailScreen> {
                         children: [
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).patient}: ${response.data.patient_name}"),
+                                "${AppLocalizations.of(context)!.patient}: ${response.data.patient_name}"),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).patientId}: ${response.data.patient_id}"),
+                                "${AppLocalizations.of(context)!.patientId}: ${response.data.patient_id}"),
                           ),
                         ],
                       ),
@@ -238,14 +188,14 @@ class _LabDetailScreenState extends State<LabDetailScreen> {
                         children: [
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).age}: ${response.data.age} "),
+                                "${AppLocalizations.of(context)!.age}: ${response.data.age} "),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).gender}: ${response.data.gender}"),
+                                "${AppLocalizations.of(context)!.gender}: ${response.data.gender}"),
                           ),
                         ],
                       ),
@@ -286,7 +236,7 @@ class _LabDetailScreenState extends State<LabDetailScreen> {
                                   "__________",
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                Text(AppLocalizations.of(context).signature),
+                                Text(AppLocalizations.of(context)!.signature),
                               ],
                             ),
                           ),

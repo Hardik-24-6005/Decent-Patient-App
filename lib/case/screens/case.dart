@@ -8,16 +8,16 @@ import '../../home/widgets/app_drawer.dart';
 import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 import 'package:flutter_html/flutter_html.dart';
 import 'package:intl/intl.dart';
 import 'package:hmz_patient/utils/colors.dart';
 
 class Case {
-  final String id;
-  final String title;
-  final String description;
-  final String date;
+  final String? id;
+  final String? title;
+  final String? description;
+  final String? date;
 
   Case({
     this.id,
@@ -27,13 +27,13 @@ class Case {
   });
 
   factory Case.fromJson(Map<String, dynamic> json) {
-    var timestamp = int.parse(json["date"]);
+    var timestamp = int.tryParse(json["date"]?.toString() ?? '0') ?? 0;
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
     var formattedDate = DateFormat("d MMMM, y").format(date);
     return Case(
-      id: json["id"],
-      title: json["title"],
-      description: json["description"],
+      id: json["id"]?.toString(),
+      title: json["title"]?.toString(),
+      description: json["description"]?.toString(),
       date: formattedDate,
     );
   }
@@ -73,15 +73,19 @@ class _CaseListState extends State<CaseList> {
       var jsondata = json.decode(response.body) as List;
       List<Case> tempCases =
           jsondata.map((data) => Case.fromJson(data)).toList();
-      setState(() {
-        cases = tempCases;
-        filteredCases = tempCases;
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          cases = tempCases;
+          filteredCases = tempCases;
+          isLoading = false;
+        });
+      }
     } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+        });
+      }
       print('Failed to fetch data: $e');
     }
   }
@@ -92,7 +96,7 @@ class _CaseListState extends State<CaseList> {
       _results = cases;
     } else {
       _results = cases
-          .where((caseItem) => caseItem.title
+          .where((caseItem) => (caseItem.title ?? '')
               .toLowerCase()
               .contains(searchController.text.toLowerCase()))
           .toList();
@@ -109,7 +113,7 @@ class _CaseListState extends State<CaseList> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).case_history,
+          AppLocalizations.of(context)!.case_history,
           style: TextStyle(
             color: appcolor.appbartext(),
             fontWeight: appcolor.appbarfontweight(),
@@ -163,7 +167,7 @@ class _CaseListState extends State<CaseList> {
                                   leading: Icon(Icons.file_copy,
                                       size: 40, color: Colors.grey),
                                   title: Text(
-                                    caseItem.title,
+                                    caseItem.title ?? '',
                                     style: TextStyle(
                                         fontSize: 18,
                                         fontFamily: 'Proxima Nova'),
@@ -182,7 +186,7 @@ class _CaseListState extends State<CaseList> {
                                       width: MediaQuery.of(context).size.width *
                                           .45,
                                       child: Text(
-                                        "${AppLocalizations.of(context).date}: ${caseItem.date}",
+                                        "${AppLocalizations.of(context)!.date}: ${caseItem.date ?? ''}",
                                         overflow: TextOverflow.visible,
                                         style: TextStyle(
                                             fontSize: 12,

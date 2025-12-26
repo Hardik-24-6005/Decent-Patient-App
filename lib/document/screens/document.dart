@@ -5,7 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:hmz_patient/auth/providers/auth.dart';
@@ -18,7 +18,7 @@ class Document {
   final String title;
   final String url;
   final String date;
-  Document({this.id, this.title, this.url, this.date});
+  Document({required this.id, required this.title, required this.url, required this.date});
   factory Document.fromJson(Map<String, dynamic> json) {
     var timestamp = int.parse(json['date']);
     var date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000);
@@ -41,7 +41,7 @@ class DocumentList extends StatefulWidget {
 }
 
 class _DocumentListState extends State<DocumentList> {
-  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   TextEditingController _searchController = TextEditingController();
   List<Document> _documents = [];
   List<Document> _filteredDocuments = [];
@@ -50,15 +50,17 @@ class _DocumentListState extends State<DocumentList> {
     super.initState();
     flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
     var android = AndroidInitializationSettings('@mipmap/ic_launcher');
-    var iOS = IOSInitializationSettings();
+    var iOS = DarwinInitializationSettings();
     var initSettings = InitializationSettings(android: android, iOS: iOS);
     flutterLocalNotificationsPlugin.initialize(initSettings,
-        onSelectNotification: selectNotification);
+        onDidReceiveNotificationResponse: selectNotification);
     _fetchDocuments();
   }
 
-  Future selectNotification(String payload) async {
-    await OpenFile.open(payload);
+  Future selectNotification(NotificationResponse details) async {
+    if (details.payload != null) {
+      await OpenFile.open(details.payload);
+    }
   }
 
   Future<void> _fetchDocuments() async {
@@ -101,9 +103,12 @@ class _DocumentListState extends State<DocumentList> {
     var status = await Permission.storage.request();
     if (status.isGranted) {
       Dio dio = Dio();
-      Directory dir = Platform.isAndroid
+      Directory? dir = Platform.isAndroid
           ? await getExternalStorageDirectory()
           : await getApplicationDocumentsDirectory();
+      
+      if (dir == null) return;
+
       String savePath = "${dir.path}/$fileName";
       await dio.download(url, savePath, onReceiveProgress: (received, total) {
         if (total != -1) {
@@ -119,7 +124,8 @@ class _DocumentListState extends State<DocumentList> {
 
   void _showProgressNotification(int id, int progress, String fileName) {
     var androidChannelSpecifics = AndroidNotificationDetails(
-        'download_channel', 'Downloads', 'Download notifications',
+        'download_channel', 'Downloads',
+        channelDescription: 'Download notifications',
         importance: Importance.max,
         priority: Priority.high,
         showWhen: false,
@@ -127,7 +133,7 @@ class _DocumentListState extends State<DocumentList> {
         showProgress: true,
         maxProgress: 100,
         progress: progress);
-    var iOSChannelSpecifics = IOSNotificationDetails();
+    var iOSChannelSpecifics = DarwinNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         android: androidChannelSpecifics, iOS: iOSChannelSpecifics);
     flutterLocalNotificationsPlugin.show(id, 'Downloading $fileName',
@@ -136,12 +142,13 @@ class _DocumentListState extends State<DocumentList> {
 
   void _showCompleteNotification(int id, String fileName, String path) {
     var androidChannelSpecifics = AndroidNotificationDetails(
-        'download_channel', 'Downloads', 'Download notifications',
+        'download_channel', 'Downloads',
+        channelDescription: 'Download notifications',
         importance: Importance.max,
         priority: Priority.high,
         onlyAlertOnce: true,
         autoCancel: true);
-    var iOSChannelSpecifics = IOSNotificationDetails();
+    var iOSChannelSpecifics = DarwinNotificationDetails();
     var platformChannelSpecifics = NotificationDetails(
         android: androidChannelSpecifics, iOS: iOSChannelSpecifics);
     flutterLocalNotificationsPlugin.show(id, '$fileName Download Complete',
@@ -153,7 +160,7 @@ class _DocumentListState extends State<DocumentList> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppLocalizations.of(context).document),
+        title: Text(AppLocalizations.of(context)!.document),
         centerTitle: true,
         leading: IconButton(
             icon: Icon(Icons.chevron_left),

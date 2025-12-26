@@ -6,36 +6,36 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../home/models/http_exception.dart';
 
 class Auth with ChangeNotifier {
-  String _token;
-  DateTime _expiryDate;
-  String _userId;
-  String _particularId;
-  Timer _authTimer;
+  String? _token;
+  DateTime? _expiryDate;
+  String? _userId;
+  String? _particularId;
+  Timer? _authTimer;
 
-  String _url_link = "";
+  String _url_link = "https://app.integritymedicaldiagnostics.com/";
 
   bool get isAuth {
     return _token != null;
   }
 
-  String get token {
+  String? get token {
     if (_expiryDate != null &&
-        _expiryDate.isAfter(DateTime.now()) &&
+        _expiryDate!.isAfter(DateTime.now()) &&
         _token != null) {
       return _token;
     }
     return null;
   }
 
-  String get userId {
+  String? get userId {
     return _userId;
   }
 
-  DateTime get expiryDate {
+  DateTime? get expiryDate {
     return _expiryDate;
   }
 
-  String get particularId {
+  String? get particularId {
     return _particularId;
   }
 
@@ -60,7 +60,6 @@ class Auth with ChangeNotifier {
 
       final responseData = json.decode(response.body);
 
-      responseData['error'] == null;
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
       }
@@ -86,7 +85,7 @@ class Auth with ChangeNotifier {
           'token': _token,
           'userId': _userId,
           'particularId': _particularId,
-          'expiryDate': _expiryDate.toIso8601String(),
+          'expiryDate': _expiryDate!.toIso8601String(),
         },
       );
       prefs.setString('userData', userData);
@@ -109,17 +108,18 @@ class Auth with ChangeNotifier {
       return false;
     }
     final extractedUserData =
-        json.decode(prefs.getString('userData')) as Map<String, Object>;
-    final expiryDate = DateTime.parse(extractedUserData['expiryDate']);
+        json.decode(prefs.getString('userData')!) as Map<String, Object?>;
+    final expiryDate =
+        DateTime.parse(extractedUserData['expiryDate'] as String);
 
     if (expiryDate.isBefore(DateTime.now())) {
       return false;
     }
 
-    this._token = extractedUserData['token'];
-    this._userId = extractedUserData['userId'];
+    this._token = extractedUserData['token'] as String?;
+    this._userId = extractedUserData['userId'] as String?;
 
-    this._particularId = extractedUserData['particularId'];
+    this._particularId = extractedUserData['particularId'] as String?;
 
     this._expiryDate = expiryDate;
 
@@ -133,7 +133,7 @@ class Auth with ChangeNotifier {
     _userId = null;
     _expiryDate = null;
     if (_authTimer != null) {
-      _authTimer.cancel();
+      _authTimer!.cancel();
       _authTimer = null;
     }
     notifyListeners();
@@ -144,9 +144,9 @@ class Auth with ChangeNotifier {
 
   void _autoLogout() {
     if (_authTimer != null) {
-      _authTimer.cancel();
+      _authTimer!.cancel();
     }
-    final timeToExpiry = _expiryDate.difference(DateTime.now()).inSeconds;
+    final timeToExpiry = _expiryDate!.difference(DateTime.now()).inSeconds;
     _authTimer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 }

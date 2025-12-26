@@ -16,12 +16,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'showPayment.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class Patient {
-  final String id;
-  final String image;
-  final String name;
+  final String? id;
+  final String? image;
+  final String? name;
 
   Patient({
     this.id,
@@ -31,44 +31,36 @@ class Patient {
 
   factory Patient.fromJson(Map<String, dynamic> json) {
     return Patient(
-      id: json['id'] as String,
-      name: json['img_url'] as String,
-      image: json['name'] as String,
+      id: json['id'] as String?,
+      name: json['img_url'] as String?,
+      image: json['name'] as String?,
     );
   }
 }
 
 class AddPaymentScreen extends StatefulWidget {
   static const routeName = '/addpayment';
-  String id;
-  AddPaymentScreen(this.id);
+  final String id;
+  const AddPaymentScreen(this.id, {super.key});
   @override
-  AddPaymentScreenState createState() => AddPaymentScreenState(this.id);
+  AddPaymentScreenState createState() => AddPaymentScreenState();
 }
 
 class AddPaymentScreenState extends State<AddPaymentScreen> {
-  String idd;
-  String patientId;
-
-  AddPaymentScreenState(this.idd) {
-    this.patientId = this.idd;
-  }
-
   final _formKey = GlobalKey<FormState>();
-  String invoiceId;
+  String? invoiceId;
   var patientlist = "";
-  Future<List<Patient>> users;
+  Future<List<Patient>>? users;
 
-  String _mySelection;
-  String _mySelection2;
-  String _mySelection3;
+  String? _mySelection;
+  String? _mySelection3;
 
-  String url2;
-  String url;
+  String? url2;
+  String? url;
 
-  List data = List();
-  List data2 = List();
-  String _cardType;
+  List data = [];
+  List data2 = [];
+  String? _cardType;
 
   TextEditingController _depositAmount = TextEditingController();
   TextEditingController _depositType = TextEditingController(text: "Card");
@@ -82,26 +74,27 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
 
   Future<String> getSWData() async {
     var res =
-        await http.get(Uri.parse(url), headers: {"Accept": "application/json"});
+        await http.get(Uri.parse(url!), headers: {"Accept": "application/json"});
     var resBody = json.decode(res.body);
 
-    setState(() {
-      data = resBody;
-      _isloading = false;
-    });
+    if (mounted) {
+      setState(() {
+        data = resBody;
+        _isloading = false;
+      });
+    }
 
-    return "Sucess";
+    return "Success";
   }
 
   @override
   void initState() {
     super.initState();
 
-    url2 = Auth().linkURL + "api/paymentGateway?id=${patientId}";
-    url = Auth().linkURL + "api/patientAllInvoices?id=${patientId}";
+    url2 = Auth().linkURL + "api/paymentGateway?id=${widget.id}";
+    url = Auth().linkURL + "api/patientAllInvoices?id=${widget.id}";
 
     this.getSWData();
-    this.patientId = this.idd;
   }
 
   bool _firstclick = true;
@@ -113,33 +106,35 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
     final res = await http.post(
       Uri.parse(posturl),
       body: {
-        'patient_id': this.patientId,
-        'payment_id': this.invoiceId,
-        'deposited_amount': this._depositAmount.text,
-        'deposit_type': this._depositType.text,
-        'card_type': this._cardType,
-        'card_number': this._cardNumber.text,
-        'expire_date': this._expiryDate.text,
-        'cvv_number': this._cvv.text,
+        'patient_id': widget.id,
+        'payment_id': invoiceId ?? '',
+        'deposited_amount': _depositAmount.text,
+        'deposit_type': _depositType.text,
+        'card_type': _cardType ?? '',
+        'card_number': _cardNumber.text,
+        'expire_date': _expiryDate.text,
+        'cvv_number': _cvv.text,
         'group': 'patient',
-        'cardholder': this._name.text,
+        'cardholder': _name.text,
       },
     );
 
     if (res.statusCode == 200 && res.body == '"successful"') {
-      setState(() {
-        _donemakingpayment = false;
-      });
+      if (mounted) {
+        setState(() {
+          _donemakingpayment = false;
+        });
+      }
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(AppLocalizations.of(context).success),
+              title: Text(AppLocalizations.of(context)!.success),
               content:
-                  Text(AppLocalizations.of(context).paymentSuccessfullMessage),
+                  Text(AppLocalizations.of(context)!.paymentSuccessfullMessage),
               actions: [
-                FlatButton(
-                  child: Text(AppLocalizations.of(context).ok),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.ok),
                   onPressed: () {
                     Navigator.of(context)
                         .pushReplacementNamed(DepositPayment.routeName);
@@ -151,17 +146,19 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
 
       return 'success';
     } else {
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
 
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(AppLocalizations.of(context).failed),
-              content: Text(AppLocalizations.of(context).paymentUnsuccessfull),
+              title: Text(AppLocalizations.of(context)!.failed),
+              content: Text(AppLocalizations.of(context)!.paymentUnsuccessfull),
               actions: [
-                FlatButton(
-                  child: Text(AppLocalizations.of(context).ok),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.ok),
                   onPressed: () {
                     Navigator.of(context)
                         .pushReplacementNamed(DepositPayment.routeName);
@@ -181,7 +178,7 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).payment,
+          AppLocalizations.of(context)!.payment,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -202,7 +199,7 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
         actions: <Widget>[
           ElevatedButton.icon(
               style: ElevatedButton.styleFrom(
-                primary: Colors.transparent,
+                backgroundColor: Colors.transparent,
                 elevation: 0.0,
               ),
               onPressed: () {
@@ -210,7 +207,7 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                   _donemakingpayment = true;
                 });
 
-                if (_formKey.currentState.validate()) {
+                if (_formKey.currentState?.validate() ?? false) {
                   if (_firstclick) {
                     _firstclick = false;
                     makePayment(context);
@@ -222,7 +219,7 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                 color: appcolor.appbaricontheme(),
               ),
               label: Text(
-                AppLocalizations.of(context).save,
+                AppLocalizations.of(context)!.save,
                 style: TextStyle(color: appcolor.appbaricontheme()),
               )),
         ],
@@ -249,24 +246,30 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                                       top: 10, bottom: 10),
                                   child: Center(
                                     child: Center(
-                                      child: new DropdownButtonFormField(
+                                      child: DropdownButtonFormField<String>(
                                         decoration: InputDecoration(
                                             labelText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .invoice),
-                                        items: data.map((item) {
-                                          return new DropdownMenuItem(
-                                            child: new Text(item['id']),
-                                            value: item['id'],
+                                        items: data.map<DropdownMenuItem<String>>((item) {
+                                          return DropdownMenuItem<String>(
+                                            value: item['id']?.toString(),
+                                            child: Text(item['id']?.toString() ?? ''),
                                           );
                                         }).toList(),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return AppLocalizations.of(context)!.invalid;
+                                          }
+                                          return null;
+                                        },
                                         onChanged: (newVal) {
                                           setState(() {
-                                            this._mySelection = newVal;
-                                            this.invoiceId = newVal;
+                                            _mySelection = newVal;
+                                            invoiceId = newVal;
                                           });
                                         },
-                                        value: this._mySelection,
+                                        value: _mySelection,
                                       ),
                                     ),
                                   ),
@@ -282,23 +285,23 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                                         keyboardType: TextInputType.number,
                                         decoration: InputDecoration(
                                             labelText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .depositAmount,
                                             hintText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .depositAmount),
                                         inputFormatters: <TextInputFormatter>[
                                           FilteringTextInputFormatter.digitsOnly
                                         ],
                                         validator: (value) {
-                                          if (value.isEmpty) {
-                                            return AppLocalizations.of(context)
+                                          if (value == null || value.isEmpty) {
+                                            return AppLocalizations.of(context)!
                                                 .depositAmountValidMessage;
                                           }
                                           return null;
                                         },
                                         onSaved: (valuez) {
-                                          _depositAmount.text = valuez;
+                                          if (valuez != null) _depositAmount.text = valuez;
                                         },
                                       ),
                                     ),
@@ -315,14 +318,14 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                                         readOnly: true,
                                         decoration: InputDecoration(
                                             labelText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .depositType,
                                             hintText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .depositType),
                                         validator: (value) {
-                                          if (value.isEmpty) {
-                                            return AppLocalizations.of(context)
+                                          if (value == null || value.isEmpty) {
+                                            return AppLocalizations.of(context)!
                                                 .depositTypeValidMessage;
                                           }
                                           return null;
@@ -338,7 +341,7 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                                     child: new DropdownButtonFormField(
                                       decoration: InputDecoration(
                                           labelText:
-                                              AppLocalizations.of(context)
+                                              AppLocalizations.of(context)!
                                                   .cardType),
                                       items: data3.map((item3) {
                                         return new DropdownMenuItem(
@@ -372,20 +375,20 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                                       child: TextFormField(
                                         decoration: InputDecoration(
                                             labelText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .name,
                                             hintText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .enterName),
                                         validator: (value1) {
-                                          if (value1.isEmpty) {
-                                            return AppLocalizations.of(context)
+                                          if (value1 == null || value1.isEmpty) {
+                                            return AppLocalizations.of(context)!
                                                 .enterCardHolderName;
                                           }
                                           return null;
                                         },
                                         onSaved: (value) {
-                                          _name.text = value;
+                                          if (value != null) _name.text = value;
                                         },
                                         controller: _name,
                                       ),
@@ -402,21 +405,21 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                                         controller: _cardNumber,
                                         decoration: InputDecoration(
                                             labelText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .cardNumber,
                                             hintText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .enterCardnumber),
                                         validator: (value2) {
-                                          if (value2.isEmpty) {
-                                            return AppLocalizations.of(context)
+                                          if (value2 == null || value2.isEmpty) {
+                                            return AppLocalizations.of(context)!
                                                 .invalidCardNumber;
                                           }
                                           _cardNumber.text = value2;
                                           return null;
                                         },
                                         onSaved: (valuez) {
-                                          _cardNumber.text = valuez;
+                                          if (valuez != null) _cardNumber.text = valuez;
                                         },
                                       ),
                                     ),
@@ -432,20 +435,20 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                                         controller: _expiryDate,
                                         decoration: InputDecoration(
                                             labelText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .exipryDate,
                                             hintText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .enterExipryDate),
                                         validator: (value3) {
-                                          if (value3.isEmpty) {
-                                            return AppLocalizations.of(context)
+                                          if (value3 == null || value3.isEmpty) {
+                                            return AppLocalizations.of(context)!
                                                 .invalid;
                                           }
                                           return null;
                                         },
                                         onSaved: (valuez) {
-                                          _expiryDate.text = valuez;
+                                          if (valuez != null) _expiryDate.text = valuez;
                                         },
                                       ),
                                     ),
@@ -461,20 +464,20 @@ class AddPaymentScreenState extends State<AddPaymentScreen> {
                                         controller: _cvv,
                                         decoration: InputDecoration(
                                             labelText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .cvv,
                                             hintText:
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .enterCvv),
                                         validator: (value4) {
-                                          if (value4.isEmpty) {
-                                            return AppLocalizations.of(context)
+                                          if (value4 == null || value4.isEmpty) {
+                                            return AppLocalizations.of(context)!
                                                 .invalidCvv;
                                           }
                                           return null;
                                         },
                                         onSaved: (valuez) {
-                                          _cvv.text = valuez;
+                                          if (valuez != null) _cvv.text = valuez;
                                         },
                                       ),
                                     ),

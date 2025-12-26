@@ -1,17 +1,11 @@
-import 'dart:io';
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/dashboard/dashboard.dart';
 import 'package:hmz_patient/language/provider/language_provider.dart';
 import 'package:hmz_patient/utils/colors.dart';
 
-import '../home/widgets/bottom_navigation_bar.dart';
-
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:date_field/date_field.dart';
 
 import 'dart:async';
 import 'dart:convert';
@@ -19,14 +13,14 @@ import 'dart:convert';
 import 'showAppointment.dart';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:searchable_dropdown/searchable_dropdown.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 class Doctor {
-  final String id;
-  final String image;
-  final String name;
+  final String? id;
+  final String? image;
+  final String? name;
 
   Doctor({
     this.id,
@@ -36,8 +30,8 @@ class Doctor {
 
   factory Doctor.fromJson(Map<String, dynamic> json) {
     return Doctor(
-      id: json['id'] as String,
-      name: json['name'] as String,
+      id: json['id'] as String?,
+      name: json['name'] as String?,
     );
   }
 }
@@ -45,8 +39,8 @@ class Doctor {
 class PatientAppointmentDetailsScreen extends StatefulWidget {
   static const routeName = '/PatientAppointmentdetail';
 
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
   PatientAppointmentDetailsScreen(this.idd, this.useridd);
 
   @override
@@ -65,34 +59,29 @@ class PatientAppointmentDetailsScreenState
   bool errordoctorslotselect = false;
 
   final _formKey = GlobalKey<FormState>();
-  String _ddoctor;
-  String _ddoctorId;
+  String? _ddoctor;
   var patientlist = "";
 
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
 
-  String url;
+  String? url;
 
-  String _mySelection;
-  String _mySelection2;
-  String _mySelection3;
-
-  List data = List();
+  List data = [];
 
   List doctorDataList = [];
-  List<DropdownMenuItem<Doctor>> dropdownDoctorItems;
+  List<DropdownMenuItem<Doctor>>? dropdownDoctorItems;
 
   List doctorSlotList = [];
-  List<DropdownMenuItem> dropdownDoctorSlotItems;
+  List<DropdownMenuItem>? dropdownDoctorSlotItems;
   var selectedDoctorSlot;
 
-  List data2 = List();
+  List data2 = [];
   List data3 = ['Confirmed', 'Pending', 'Requested'];
   String availableSlot = '';
   TextEditingController appointmentStatus = TextEditingController();
-  String _patient;
-  DateTime selectedDate;
+  String? _patient;
+  DateTime? selectedDate;
 
   bool _isloading = true;
 
@@ -100,8 +89,8 @@ class PatientAppointmentDetailsScreenState
   TextEditingController _remarks = TextEditingController();
 
   List<dynamic> buildDoctorSlotItems(List doctorslot) {
-    List<String> itemss = List();
-    doctorSlotList = new List();
+    List<String> itemss = [];
+    doctorSlotList = [];
     for (var zdoctor in doctorslot) {
       doctorSlotList
           .add([zdoctor['s_time'] + " To " + zdoctor['e_time'], false]);
@@ -129,7 +118,7 @@ class PatientAppointmentDetailsScreenState
   }
 
   Future<String> getSWData() async {
-    String urrr1 = url;
+    String urrr1 = url!;
 
     var res = await http.get(
       Uri.parse(urrr1),
@@ -167,12 +156,12 @@ class PatientAppointmentDetailsScreenState
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(AppLocalizations.of(context).success),
+              title: Text(AppLocalizations.of(context)!.success),
               content:
-                  Text(AppLocalizations.of(context).appointmentCreatedMessage),
+                  Text(AppLocalizations.of(context)!.appointmentCreatedMessage),
               actions: [
-                FlatButton(
-                  child: Text(AppLocalizations.of(context).ok),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.ok),
                   onPressed: () {
                     Navigator.of(context).pushReplacementNamed(
                         ShowPatientAppointmentScreen.routeName);
@@ -188,8 +177,6 @@ class PatientAppointmentDetailsScreenState
     }
   }
 
-  bool _firstclick = true;
-
   @override
   void initState() {
     super.initState();
@@ -199,7 +186,7 @@ class PatientAppointmentDetailsScreenState
     this.getSWData();
 
     _patient = this.idd;
-    appointmentStatus = new TextEditingController(text: 'Requested');
+    appointmentStatus = new TextEditingController(text: 'Pending Confirmation');
   }
 
   AppColor appcolor = new AppColor();
@@ -212,7 +199,7 @@ class PatientAppointmentDetailsScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).appointment,
+          AppLocalizations.of(context)!.appointment,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -245,42 +232,75 @@ class PatientAppointmentDetailsScreenState
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       Container(
-                        child: SearchableDropdown.single(
-                          displayClearIcon: false,
-                          items: doctorDataList.map((item) {
-                            return new DropdownMenuItem(
-                              child: Container(
-                                padding: EdgeInsets.only(top: 15, bottom: 15),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    Container(
-                                      width: 30,
-                                      height: 30,
-                                      child: Image.network(
-                                          "https://image.flaticon.com/icons/png/512/147/147144.png"),
-                                    ),
-                                    SizedBox(
-                                      width: 10,
-                                    ),
-                                    Text(item["name"]),
-                                  ],
+                        child: DropdownSearch<dynamic>(
+                          items: (filter, loadProps) =>
+                              Future.value(doctorDataList),
+                          itemAsString: (item) => item["name"],
+                          compareFn: (item1, item2) =>
+                              item1["id"] == item2["id"],
+                          selectedItem: _ddoctor == null
+                              ? null
+                              : doctorDataList.firstWhere(
+                                  (element) => element["id"] == _ddoctor,
+                                  orElse: () => null),
+                          decoratorProps: DropDownDecoratorProps(
+                            decoration: InputDecoration(
+                              hintText: "Select Doctor",
+                              labelText: "Select Doctor",
+
+                              // Normal border
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+
+                              // Enabled border
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.grey,
+                                  width: 1.2,
                                 ),
                               ),
-                              value: item,
-                            );
-                          }).toList(),
-                          value: _ddoctor,
-                          hint: Container(
-                            padding: EdgeInsets.symmetric(vertical: 15),
-                            child: Text(
-                              "Choose a doctor",
-                              style: TextStyle(
-                                fontSize: 16,
+
+                              // Focused border
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 1.8,
+                                ),
                               ),
+
+                              // Error border
+                              errorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.red,
+                                  width: 1.5,
+                                ),
+                              ),
+
+                              // Focused error border
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                                borderSide: BorderSide(
+                                  color: Colors.redAccent,
+                                  width: 1.8,
+                                ),
+                              ),
+
+                              errorText: errordoctorselect
+                                  ? "Please select a doctor"
+                                  : null,
                             ),
                           ),
-                          searchHint: "Search doctor",
+                          popupProps: PopupProps.menu(
+                            showSearchBox: true,
+                            searchFieldProps: TextFieldProps(
+                              decoration:
+                                  InputDecoration(hintText: "Search doctor"),
+                            ),
+                          ),
                           onChanged: (value) {
                             setState(() {
                               errordoctorselect = false;
@@ -288,18 +308,18 @@ class PatientAppointmentDetailsScreenState
 
                               availableSlot = "";
 
-                              String formattedDate = DateFormat('yyyy-MM-dd')
-                                  .format(DateTime.now());
+                              String formattedDate =
+                                  DateFormat('yyyy-MM-dd').format(_selectedDay);
                               this._date = formattedDate;
+
                               String getslot = Auth().linkURL +
                                   'api/getDoctorTimeSlop?doctor_id=' +
-                                  _ddoctor +
+                                  _ddoctor! +
                                   '&date=' +
                                   this._date;
                               getDoctorSlot(getslot);
                             });
                           },
-                          isExpanded: true,
                         ),
                       ),
                       (errordoctorselect)
@@ -333,13 +353,15 @@ class PatientAppointmentDetailsScreenState
                                   DateFormat('yyyy-MM-dd').format(_selectedDay);
                               this._date = formattedDate;
 
-                              String getslot = Auth().linkURL +
-                                  'api/getDoctorTimeSlop?doctor_id=' +
-                                  _ddoctor +
-                                  '&date=' +
-                                  formattedDate;
-                              availableSlot = "";
-                              getDoctorSlot(getslot);
+                              if (_ddoctor != null) {
+                                String getslot = Auth().linkURL +
+                                    'api/getDoctorTimeSlop?doctor_id=' +
+                                    _ddoctor! +
+                                    '&date=' +
+                                    formattedDate;
+                                availableSlot = "";
+                                getDoctorSlot(getslot);
+                              }
                             });
                           },
                           calendarFormat: CalendarFormat.twoWeeks,
@@ -379,7 +401,7 @@ class PatientAppointmentDetailsScreenState
                         child: Center(
                           child: Container(
                             width: double.infinity,
-                            height: (true) ? 180 : 0,
+                            height: 180,
                             decoration: BoxDecoration(
                                 border: Border(
                               top: BorderSide(width: 1, color: Colors.black12),
@@ -406,19 +428,19 @@ class PatientAppointmentDetailsScreenState
                                     return Padding(
                                       padding: const EdgeInsets.all(0),
                                       child: TextButton(
-                                        style: (doctorSlotList[index][1] ==
-                                                true)
-                                            ? ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all(
-                                                        Theme.of(context)
-                                                            .primaryColor),
-                                              )
-                                            : ButtonStyle(
-                                                backgroundColor:
-                                                    MaterialStateProperty.all(
-                                                        Colors.amberAccent),
-                                              ),
+                                        style:
+                                            (doctorSlotList[index][1] == true)
+                                                ? ButtonStyle(
+                                                    backgroundColor:
+                                                        WidgetStateProperty.all(
+                                                            Theme.of(context)
+                                                                .primaryColor),
+                                                  )
+                                                : ButtonStyle(
+                                                    backgroundColor:
+                                                        WidgetStateProperty.all(
+                                                            Colors.amberAccent),
+                                                  ),
                                         onPressed: () {
                                           setState(() {
                                             for (var listdatas = 0;
@@ -485,13 +507,13 @@ class PatientAppointmentDetailsScreenState
                                 controller: _remarks,
                                 decoration: InputDecoration(
                                     labelText:
-                                        AppLocalizations.of(context).remarks,
-                                    hintText: AppLocalizations.of(context)
+                                        AppLocalizations.of(context)!.remarks,
+                                    hintText: AppLocalizations.of(context)!
                                         .giveYourRemarks,
                                     border: InputBorder.none),
                                 validator: (value) {
-                                  if (value.isEmpty) {
-                                    return AppLocalizations.of(context)
+                                  if (value == null || value.isEmpty) {
+                                    return AppLocalizations.of(context)!
                                         .invalidInput;
                                   }
                                   return null;
@@ -505,13 +527,12 @@ class PatientAppointmentDetailsScreenState
                         width: double.infinity,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (_formKey.currentState.validate()) {
+                            if (_formKey.currentState!.validate()) {
                               if (_ddoctor == "" || _ddoctor == null) {
                                 setState(() {
                                   errordoctorselect = true;
                                 });
-                              } else if (availableSlot == "" ||
-                                  availableSlot == null) {
+                              } else if (availableSlot == "") {
                                 setState(() {
                                   errordoctorslotselect = true;
                                 });
@@ -520,7 +541,7 @@ class PatientAppointmentDetailsScreenState
                               }
                             }
                           },
-                          child: Text(AppLocalizations.of(context).save),
+                          child: Text(AppLocalizations.of(context)!.save),
                         ),
                       ),
                     ],

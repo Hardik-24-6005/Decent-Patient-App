@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/utils/colors.dart';
 import '../home/widgets/bottom_navigation_bar.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'dart:async';
@@ -11,18 +9,18 @@ import '../jitsi/jitsi.dart';
 import 'addPayment.dart';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class PaymentDetails {
-  final String id;
-  final String patient_name;
-  final String doctor_name;
-  final String date;
-  final String start_time;
-  final String end_time;
-  final String status;
-  final String remarks;
-  final String jitsi_link;
+  final String? id;
+  final String? patient_name;
+  final String? doctor_name;
+  final String? date;
+  final String? start_time;
+  final String? end_time;
+  final String? status;
+  final String? remarks;
+  final String? jitsi_link;
 
   PaymentDetails({
     this.id,
@@ -38,11 +36,11 @@ class PaymentDetails {
 }
 
 class DepositedAmount {
-  final String id;
-  final String patient_id;
-  final String deposited_amount;
-  final String date;
-  final String payment_id;
+  final String? id;
+  final String? patient_id;
+  final String? deposited_amount;
+  final String? date;
+  final String? payment_id;
 
   DepositedAmount({
     this.id,
@@ -55,27 +53,23 @@ class DepositedAmount {
 
 class AllInvoicePayment extends StatefulWidget {
   static const routeName = '/allinvoicepayment';
-  String id;
-  String userid;
-  AllInvoicePayment(this.id, this.userid);
+  final String id;
+  final String userid;
+  const AllInvoicePayment(this.id, this.userid, {super.key});
 
   @override
   AllInvoicePaymentState createState() =>
-      AllInvoicePaymentState(this.id, this.userid);
+      AllInvoicePaymentState();
 }
 
 class AllInvoicePaymentState extends State<AllInvoicePayment> {
-  String idd;
-  String userid;
-  String total;
-  String deposit;
-  String due;
-
-  AllInvoicePaymentState(this.idd, this.userid);
+  String? total;
+  String? deposit;
+  String? due;
 
   Future<List<PaymentDetails>> _responseFuture() async {
-    final patient_id = this.idd;
-    final patient_userid = this.userid;
+    final patient_id = widget.id;
+    // final patient_userid = widget.userid; // Unused
 
     var data = await http.get(
         Uri.parse(Auth().linkURL + "api/patientAllInvoices?id=${patient_id}"));
@@ -93,15 +87,15 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
 
     for (var u in jsondata) {
       PaymentDetails subdata = PaymentDetails(
-        id: u["id"],
-        patient_name: u["patient_name"],
-        doctor_name: u["doctor_name"],
-        date: u["date_string"],
-        start_time: u["amount"],
-        end_time: u["hospital_amount"],
-        remarks: u["doctor_amount"],
-        status: u["deposit_type"],
-        jitsi_link: u["patient_phone"],
+        id: u["id"]?.toString(),
+        patient_name: u["patient_name"]?.toString(),
+        doctor_name: u["doctor_name"]?.toString(),
+        date: u["date_string"]?.toString(),
+        start_time: u["amount"]?.toString(),
+        end_time: u["hospital_amount"]?.toString(),
+        remarks: u["doctor_amount"]?.toString(),
+        status: u["deposit_type"]?.toString(),
+        jitsi_link: u["patient_phone"]?.toString(),
       );
       _lcdata.add(subdata);
     }
@@ -114,21 +108,23 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
     final res = await http.post(
       Uri.parse(posturl),
       body: {
-        'id': this.idd,
-        'ion_id': this.userid,
+        'id': widget.id,
+        'ion_id': widget.userid,
       },
     );
 
     var jsondata = json.decode(res.body);
 
-    setState(() {
-      var ss = jsondata["total"];
-      var ss2 = jsondata["deposit"];
-      var ss3 = jsondata["due"];
-      this.total = "$ss";
-      this.deposit = "$ss2";
-      this.due = "$ss3";
-    });
+    if (mounted) {
+      setState(() {
+        var ss = jsondata["total"];
+        var ss2 = jsondata["deposit"];
+        var ss3 = jsondata["due"];
+        this.total = "$ss";
+        this.deposit = "$ss2";
+        this.due = "$ss3";
+      });
+    }
   }
 
   @override
@@ -142,7 +138,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).allInvoices,
+          AppLocalizations.of(context)!.allInvoices,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -163,14 +159,14 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
         actions: <Widget>[
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              primary: Colors.transparent,
+              backgroundColor: Colors.transparent,
               elevation: 0.0,
             ),
             onPressed: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => AddPaymentScreen(this.idd)));
+                      builder: (context) => AddPaymentScreen(widget.id)));
             },
             icon: Icon(
               Icons.add_rounded,
@@ -180,9 +176,9 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
         ],
       ),
       body: Container(
-        child: new FutureBuilder(
+        child: FutureBuilder<List<PaymentDetails>>(
           future: _responseFuture(),
-          builder: (BuildContext context, AsyncSnapshot response) {
+          builder: (BuildContext context, AsyncSnapshot<List<PaymentDetails>> response) {
             if (response.data == null) {
               return Container(
                 child: Center(child: CircularProgressIndicator()),
@@ -203,14 +199,14 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                           color: Colors.orange,
                           child: ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Colors.blue.withOpacity(.5)),
+                              backgroundColor: WidgetStateProperty.all(
+                                  Colors.blue.withValues(alpha: .5)),
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  AppLocalizations.of(context).totalAmount,
+                                  AppLocalizations.of(context)!.totalAmount,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -219,7 +215,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                 ),
                                 Padding(padding: EdgeInsets.all(2)),
                                 Text(
-                                  "${this.total}",
+                                  "${total ?? '0'}",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -235,14 +231,14 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                           color: Colors.orange,
                           child: ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Colors.blue.withOpacity(.5)),
+                              backgroundColor: WidgetStateProperty.all(
+                                  Colors.blue.withValues(alpha: .5)),
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  AppLocalizations.of(context).totalDeposit,
+                                  AppLocalizations.of(context)!.totalDeposit,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -251,7 +247,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                 ),
                                 Padding(padding: EdgeInsets.all(2)),
                                 Text(
-                                  "${this.deposit}",
+                                  "${deposit ?? '0'}",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -267,14 +263,14 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                           color: Colors.orange,
                           child: ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Colors.blue.withOpacity(.5)),
+                              backgroundColor: WidgetStateProperty.all(
+                                  Colors.blue.withValues(alpha: .5)),
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  AppLocalizations.of(context).totalDue,
+                                  AppLocalizations.of(context)!.totalDue,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -283,7 +279,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                 ),
                                 Padding(padding: EdgeInsets.all(2)),
                                 Text(
-                                  "${this.due}",
+                                  "${due ?? '0'}",
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -301,8 +297,9 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                     child: ListView.builder(
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
-                        itemCount: response.data.length,
+                        itemCount: response.data!.length,
                         itemBuilder: (BuildContext context, int index) {
+                          var item = response.data![index];
                           return Container(
                             margin: EdgeInsets.only(bottom: 10),
                             child: ExpansionTile(
@@ -314,7 +311,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                       child: Padding(
                                           padding: EdgeInsets.only(right: 20),
                                           child: Text(
-                                            "${response.data[index].date}",
+                                            "${item.date}",
                                             style: TextStyle(fontSize: 14),
                                           )),
                                     ),
@@ -322,7 +319,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                       child: Padding(
                                           padding: EdgeInsets.only(right: 20),
                                           child: Text(
-                                            "${response.data[index].id}",
+                                            "${item.id}",
                                             style: TextStyle(fontSize: 14),
                                             overflow: TextOverflow.ellipsis,
                                           )),
@@ -331,7 +328,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                       child: Padding(
                                           padding: EdgeInsets.only(right: 20),
                                           child: Text(
-                                            "${response.data[index].patient_name}",
+                                            "${item.patient_name}",
                                             style: TextStyle(fontSize: 14),
                                             overflow: TextOverflow.ellipsis,
                                           )),
@@ -354,7 +351,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             EdgeInsets.only(left: 50),
                                         title: Row(
                                           children: [
-                                            Text(AppLocalizations.of(context)
+                                            Text(AppLocalizations.of(context)!
                                                 .invoiceId),
                                             Padding(
                                               padding:
@@ -362,7 +359,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response.data[index].id}")),
+                                                    "${item.id}")),
                                           ],
                                         ),
                                       ),
@@ -371,7 +368,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             EdgeInsets.only(left: 50),
                                         title: Row(
                                           children: [
-                                            Text(AppLocalizations.of(context)
+                                            Text(AppLocalizations.of(context)!
                                                 .patientName),
                                             Padding(
                                               padding:
@@ -379,7 +376,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response.data[index].patient_name}")),
+                                                    "${item.patient_name}")),
                                           ],
                                         ),
                                       ),
@@ -388,7 +385,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             EdgeInsets.only(left: 50),
                                         title: Row(
                                           children: [
-                                            Text(AppLocalizations.of(context)
+                                            Text(AppLocalizations.of(context)!
                                                 .doctorName),
                                             Padding(
                                               padding:
@@ -396,7 +393,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response.data[index].doctor_name}")),
+                                                    "${item.doctor_name}")),
                                           ],
                                         ),
                                       ),
@@ -405,7 +402,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             EdgeInsets.only(left: 50),
                                         title: Row(
                                           children: [
-                                            Text(AppLocalizations.of(context)
+                                            Text(AppLocalizations.of(context)!
                                                 .date),
                                             Padding(
                                               padding:
@@ -413,7 +410,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response.data[index].date}")),
+                                                    "${item.date}")),
                                           ],
                                         ),
                                       ),
@@ -422,7 +419,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             EdgeInsets.only(left: 50),
                                         title: Row(
                                           children: [
-                                            Text(AppLocalizations.of(context)
+                                            Text(AppLocalizations.of(context)!
                                                 .amount),
                                             Padding(
                                               padding:
@@ -430,7 +427,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response.data[index].start_time}")),
+                                                    "${item.start_time}")),
                                           ],
                                         ),
                                       ),
@@ -439,7 +436,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             EdgeInsets.only(left: 50),
                                         title: Row(
                                           children: [
-                                            Text(AppLocalizations.of(context)
+                                            Text(AppLocalizations.of(context)!
                                                 .depositType),
                                             Padding(
                                               padding:
@@ -447,7 +444,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response.data[index].status}")),
+                                                    "${item.status}")),
                                           ],
                                         ),
                                       ),
@@ -456,7 +453,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             EdgeInsets.only(left: 50),
                                         title: Row(
                                           children: [
-                                            Text(AppLocalizations.of(context)
+                                            Text(AppLocalizations.of(context)!
                                                 .patientPhone),
                                             Padding(
                                               padding:
@@ -464,7 +461,7 @@ class AllInvoicePaymentState extends State<AllInvoicePayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response.data[index].jitsi_link}")),
+                                                    "${item.jitsi_link}")),
                                           ],
                                         ),
                                       ),

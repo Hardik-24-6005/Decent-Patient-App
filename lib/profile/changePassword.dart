@@ -13,13 +13,13 @@ import 'dart:async';
 import 'dart:convert';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class Profile extends StatefulWidget {
   static const routeName = '/profile';
 
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
   Profile(this.idd, this.useridd);
 
   @override
@@ -33,38 +33,40 @@ class ProfileState extends State<Profile> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String url;
+  String? url;
 
   TextEditingController _name = TextEditingController();
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
 
-  List data = new List();
-  String zname;
+  List data = [];
+  String? zname;
   bool _isloading = true;
 
   Future<String> getSWData() async {
-    String urrr1 = url + "${this.useridd}";
+    String urrr1 = url! + "${this.useridd}";
     var res = await http
         .get(Uri.parse(urrr1), headers: {"Accept": "application/json"});
     var resBody = json.decode(res.body);
 
+    if (!mounted) return "Error";
+
     setState(() {
       data = resBody;
 
-      var email;
-      var pass;
-      var name;
+      String? email;
+      String? pass;
+      String? name;
       for (var i = 0; i < data.length; i++) {
-        email = data[i]['email'];
-        pass = data[i]['password'];
-        name = data[i]['username'];
+        email = data[i]['email']?.toString();
+        pass = data[i]['password']?.toString();
+        name = data[i]['username']?.toString();
         zname = name;
         break;
       }
 
-      _email = new TextEditingController(text: email);
-      _name = new TextEditingController(text: name);
+      _email.text = email ?? '';
+      _name.text = name ?? '';
 
       _isloading = false;
     });
@@ -80,7 +82,7 @@ class ProfileState extends State<Profile> {
   }
 
   Future<String> changePassword(context) async {
-    if (_name != zname || _password != "") {
+    if (_name.text != zname || _password.text != "") {
       String posturl = Auth().linkURL + "api/updateProfile";
 
       final res = await http.post(
@@ -94,18 +96,19 @@ class ProfileState extends State<Profile> {
       );
 
       if (res.statusCode == 200) {
+        if (!mounted) return 'success';
         showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text(
-                  AppLocalizations.of(context).success,
+                  AppLocalizations.of(context)!.success,
                 ),
                 content: Text(
-                    AppLocalizations.of(context).changesUpdatedSuccessfuly),
+                    AppLocalizations.of(context)!.changesUpdatedSuccessfuly),
                 actions: [
-                  FlatButton(
-                    child: Text(AppLocalizations.of(context).ok),
+                  TextButton(
+                    child: Text(AppLocalizations.of(context)!.ok),
                     onPressed: () {
                       Navigator.of(context)
                           .pushReplacementNamed(Profile.routeName);
@@ -124,11 +127,11 @@ class ProfileState extends State<Profile> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(AppLocalizations.of(context).invalid),
-              content: Text(AppLocalizations.of(context).invalidInput),
+              title: Text(AppLocalizations.of(context)!.invalid),
+              content: Text(AppLocalizations.of(context)!.invalidInput),
               actions: [
-                FlatButton(
-                  child: Text(AppLocalizations.of(context).ok),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.ok),
                   onPressed: () {
                     Navigator.of(context)
                         .pushReplacementNamed(Profile.routeName);
@@ -137,6 +140,7 @@ class ProfileState extends State<Profile> {
               ],
             );
           });
+      return "invalid";
     }
   }
 
@@ -146,7 +150,7 @@ class ProfileState extends State<Profile> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).changePassword,
+          AppLocalizations.of(context)!.changePassword,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -187,11 +191,11 @@ class ProfileState extends State<Profile> {
                               readOnly: true,
                               decoration: InputDecoration(
                                   labelText:
-                                      '${AppLocalizations.of(context).email} (${AppLocalizations.of(context).notChangable})',
-                                  hintText: AppLocalizations.of(context).email),
+                                      '${AppLocalizations.of(context)!.email} (${AppLocalizations.of(context)!.notChangable})',
+                                  hintText: AppLocalizations.of(context)!.email),
                               validator: (value) {
-                                if (value.isEmpty) {
-                                  return AppLocalizations.of(context)
+                                if (value!.isEmpty) {
+                                  return AppLocalizations.of(context)!
                                       .invalidEmail;
                                 }
                                 return null;
@@ -210,12 +214,12 @@ class ProfileState extends State<Profile> {
                               obscureText: true,
                               decoration: InputDecoration(
                                   labelText:
-                                      AppLocalizations.of(context).password,
+                                      AppLocalizations.of(context)!.password,
                                   hintText:
-                                      AppLocalizations.of(context).password),
+                                      AppLocalizations.of(context)!.password),
                               validator: (value) {
-                                if (value.isEmpty || value.length < 5) {
-                                  return AppLocalizations.of(context)
+                                if (value!.isEmpty || value.length < 5) {
+                                  return AppLocalizations.of(context)!
                                       .invalidPassword;
                                 }
                                 return null;
@@ -228,11 +232,11 @@ class ProfileState extends State<Profile> {
                         width: MediaQuery.of(context).size.width * .9,
                         child: ElevatedButton(
                           onPressed: () {
-                            if (_formKey.currentState.validate()) {
+                            if (_formKey.currentState!.validate()) {
                               changePassword(context);
                             }
                           },
-                          child: Text(AppLocalizations.of(context).update),
+                          child: Text(AppLocalizations.of(context)!.update),
                         ),
                       )
                     ],

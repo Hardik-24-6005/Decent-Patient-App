@@ -6,14 +6,14 @@ import '../l10n/l10n.dart';
 import '../language/provider/language_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 enum ChangingLanguages { English, French }
 
 class SettingScreen extends StatefulWidget {
   static const routeName = '/setting';
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
   SettingScreen(this.idd, this.useridd);
   @override
   SettingScreenState createState() =>
@@ -25,8 +25,6 @@ class SettingScreenState extends State<SettingScreen> {
   String useridd;
   SettingScreenState(this.idd, this.useridd);
 
-  ChangingLanguages _character = ChangingLanguages.English;
-
   AppColor appcolor = new AppColor();
 
   Widget build(BuildContext context) {
@@ -36,7 +34,7 @@ class SettingScreenState extends State<SettingScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            AppLocalizations.of(context).setting,
+            AppLocalizations.of(context)!.setting,
             style: TextStyle(
                 color: appcolor.appbartext(),
                 fontWeight: appcolor.appbarfontweight()),
@@ -70,7 +68,7 @@ class SettingScreenState extends State<SettingScreen> {
                         padding:
                             EdgeInsets.symmetric(horizontal: 30, vertical: 5),
                         child: Text(
-                          AppLocalizations.of(context).language,
+                          AppLocalizations.of(context)!.language,
                           style: TextStyle(fontSize: 18),
                         ),
                       ),
@@ -110,7 +108,7 @@ class SettingScreenState extends State<SettingScreen> {
                   child: Padding(
                     padding: EdgeInsets.only(left: 10, right: 10),
                     child: ListTile(
-                      title: Text(AppLocalizations.of(context).changePassword),
+                      title: Text(AppLocalizations.of(context)!.changePassword),
                       trailing: InkWell(
                         child: Icon(Icons.send),
                         onTap: () {

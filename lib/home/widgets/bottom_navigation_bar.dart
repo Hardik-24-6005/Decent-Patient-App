@@ -4,7 +4,7 @@ import '../../profile/changePassword.dart';
 import '../../patient/showAppointment.dart';
 import '../../dashboard/dashboard.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class AppBottomNavigationBar extends StatefulWidget {
   var screenNum;
@@ -12,30 +12,29 @@ class AppBottomNavigationBar extends StatefulWidget {
 
   @override
   _AppBottomNavigationBarState createState() =>
-      _AppBottomNavigationBarState(screenNum: this.screenNum);
+      _AppBottomNavigationBarState();
 }
 
 class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
-  var screenNum;
-  int _selectedIndex;
-  Color selectedcolor;
+  late int _selectedIndex;
+  int? _selectedIndexValue;
+  late Color selectedColor;
+  late TextStyle optionStyle;
 
-  int _selectedIndexValue;
-  TextStyle optionStyle = TextStyle(fontSize: 15);
+  @override
+  void initState() {
+    super.initState();
 
-  _AppBottomNavigationBarState({this.screenNum}) {
-    this._selectedIndex = screenNum;
-    if (_selectedIndex == null) {
-      _selectedIndex = 0;
-      _selectedIndexValue = null;
-      selectedcolor = Colors.blue;
-      this.optionStyle = TextStyle(fontSize: 15);
-    } else {
-      _selectedIndexValue = screenNum;
-      selectedcolor = Colors.blue;
-      this.optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-    }
+    _selectedIndex = widget.screenNum ?? 0;
+    _selectedIndexValue = widget.screenNum;
+
+    selectedColor = Colors.blue;
+
+    optionStyle = widget.screenNum == null
+        ? const TextStyle(fontSize: 15)
+        : const TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
   }
+
 
   void _onItemTapped(int index) {
     setState(() {
@@ -58,31 +57,31 @@ class _AppBottomNavigationBarState extends State<AppBottomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    String dashboard = "${AppLocalizations.of(context).dashboard}";
+    String dashboard = "${AppLocalizations.of(context)!.dashboard}";
 
     return BottomNavigationBar(
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(Icons.home),
           label: (_selectedIndexValue == 0)
-              ? AppLocalizations.of(context).dashboard
+              ? AppLocalizations.of(context)!.dashboard
               : "",
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.list),
           label: (_selectedIndexValue == 1)
-              ? AppLocalizations.of(context).appointments
+              ? AppLocalizations.of(context)!.appointments
               : "",
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.person),
           label: (_selectedIndexValue == 2)
-              ? AppLocalizations.of(context).profile
+              ? AppLocalizations.of(context)!.profile
               : "",
         ),
       ],
       currentIndex: _selectedIndex,
-      selectedItemColor: selectedcolor,
+      selectedItemColor: selectedColor,
       onTap: _onItemTapped,
     );
   }

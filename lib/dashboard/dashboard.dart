@@ -27,21 +27,19 @@ import '../patient/showAppointment.dart';
 import '../patient/todaysappointment.dart';
 import '../profile/changePassword.dart';
 import '../auth/providers/auth.dart';
-import '../case/screens/case.dart';
-import '../document/screens/document.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class AppintmentDetails {
-  final String id;
-  final String patient_name;
-  final String doctor_name;
-  final String date;
-  final String start_time;
-  final String end_time;
-  final String status;
-  final String remarks;
-  final String jitsi_link;
+  final String? id;
+  final String? patient_name;
+  final String? doctor_name;
+  final String? date;
+  final String? start_time;
+  final String? end_time;
+  final String? status;
+  final String? remarks;
+  final String? jitsi_link;
 
   AppintmentDetails({
     this.id,
@@ -59,20 +57,16 @@ class AppintmentDetails {
 class DashboardScreen extends StatefulWidget {
   static const routeName = '/dsh';
 
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
   DashboardScreen(this.idd, this.useridd);
 
   @override
-  DashboardScreenState createState() =>
-      DashboardScreenState(this.idd, this.useridd);
+  DashboardScreenState createState() => DashboardScreenState();
 }
 
 class DashboardScreenState extends State<DashboardScreen> {
-  String idd;
-  String useridd;
-  DashboardScreenState(this.idd, this.useridd);
-  int len;
+  int? len;
 
   Future<List<AppintmentDetails>> _responseFuture() async {
     // var data = await http.get(Uri.parse(Auth().linkURL +
@@ -85,7 +79,7 @@ class DashboardScreenState extends State<DashboardScreen> {
         Uri.parse(url),
         body: {
           'group': "patient",
-          'id': idd,
+          'id': widget.idd,
         },
       );
 
@@ -95,7 +89,7 @@ class DashboardScreenState extends State<DashboardScreen> {
 
       for (var u in jsondata) {
         AppintmentDetails subdata = AppintmentDetails(
-          id: u["id"],
+          id: u["id"].toString(),
           patient_name: u["patient_name"],
           doctor_name: u["doctor_name"],
           date: u["date"],
@@ -121,13 +115,13 @@ class DashboardScreenState extends State<DashboardScreen> {
     super.initState();
   }
 
-  AppColor appcolor = new AppColor();
+  AppColor appcolor = AppColor();
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).dashboard,
+          AppLocalizations.of(context)!.dashboard,
           style: TextStyle(
             color: appcolor.appbartext(),
             fontWeight: appcolor.appbarfontweight(),
@@ -144,8 +138,8 @@ class DashboardScreenState extends State<DashboardScreen> {
               child: CircleAvatar(
                 radius: 22,
                 backgroundImage: NetworkImage(
-                        "https://image.flaticon.com/icons/png/512/147/147144.png") ??
-                    Icon(Icons.person),
+                        ""),
+                child: Icon(Icons.person),
                 backgroundColor: Colors.transparent,
               ),
               onTap: () {
@@ -176,7 +170,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                       top: 10, right: 5, bottom: 5, left: 5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
+                      backgroundColor: Colors.white,
                       shadowColor: Color.fromRGBO(0, 0, 0, .5),
                       elevation: 5,
                       alignment: Alignment.bottomLeft,
@@ -192,7 +186,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Padding(padding: EdgeInsets.all(15)),
                         Text(
-                          AppLocalizations.of(context).bookADoctor,
+                          AppLocalizations.of(context)!.bookADoctor,
                           style: TextStyle(fontSize: 14, color: Colors.black),
                           textAlign: TextAlign.left,
                         ),
@@ -211,7 +205,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                       top: 10, right: 5, bottom: 5, left: 5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
+                      backgroundColor: Colors.white,
                       shadowColor: Color.fromRGBO(0, 0, 0, .5),
                       elevation: 5,
                       alignment: Alignment.bottomLeft,
@@ -227,7 +221,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Padding(padding: EdgeInsets.all(15)),
                         Text(
-                          AppLocalizations.of(context).appointments,
+                          AppLocalizations.of(context)!.appointments,
                           textAlign: TextAlign.left,
                           style: TextStyle(fontSize: 14, color: Colors.black),
                         ),
@@ -245,8 +239,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                   padding: const EdgeInsets.all(5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Colors.black, // foreground
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black, // foreground
                       shadowColor: Color.fromRGBO(0, 0, 0, .5),
                       elevation: 5,
                       alignment: Alignment.bottomLeft,
@@ -262,7 +256,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Padding(padding: EdgeInsets.all(15)),
                         Text(
-                          AppLocalizations.of(context).prescription,
+                          AppLocalizations.of(context)!.prescription,
                           style: TextStyle(fontSize: 15, color: Colors.black),
                           textAlign: TextAlign.left,
                         ),
@@ -280,8 +274,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                   padding: const EdgeInsets.all(5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Colors.black, // foreground
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black, // foreground
                       shadowColor: Color.fromRGBO(0, 0, 0, .5),
                       elevation: 5,
                       alignment: Alignment.bottomLeft,
@@ -297,7 +291,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Padding(padding: EdgeInsets.all(15)),
                         Text(
-                          AppLocalizations.of(context).labReports,
+                          AppLocalizations.of(context)!.labReports,
                           style: TextStyle(fontSize: 15, color: Colors.black),
                           textAlign: TextAlign.left,
                         ),
@@ -315,8 +309,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                   padding: const EdgeInsets.all(5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Colors.black, // foreground
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black, // foreground
                       shadowColor: Color.fromRGBO(0, 0, 0, .5),
                       elevation: 5,
                       alignment: Alignment.bottomLeft,
@@ -332,7 +326,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Padding(padding: EdgeInsets.all(15)),
                         Text(
-                          AppLocalizations.of(context).case_history,
+                          AppLocalizations.of(context)!.case_history,
                           style: TextStyle(fontSize: 15, color: Colors.black),
                           textAlign: TextAlign.left,
                         ),
@@ -350,8 +344,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                   padding: const EdgeInsets.all(5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Colors.black, // foreground
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black, // foreground
                       shadowColor: Color.fromRGBO(0, 0, 0, .5),
                       elevation: 5,
                       alignment: Alignment.bottomLeft,
@@ -367,7 +361,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Padding(padding: EdgeInsets.all(15)),
                         Text(
-                          AppLocalizations.of(context).documents,
+                          AppLocalizations.of(context)!.documents,
                           style: TextStyle(fontSize: 15, color: Colors.black),
                           textAlign: TextAlign.left,
                         ),
@@ -385,8 +379,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                   padding: const EdgeInsets.all(5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Colors.black, // foreground
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black, // foreground
                       shadowColor: Color.fromRGBO(0, 0, 0, .5),
                       elevation: 5,
                       alignment: Alignment.bottomLeft,
@@ -402,7 +396,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Padding(padding: EdgeInsets.all(15)),
                         Text(
-                          AppLocalizations.of(context).profile,
+                          AppLocalizations.of(context)!.profile,
                           style: TextStyle(fontSize: 15, color: Colors.black),
                           textAlign: TextAlign.left,
                         ),
@@ -420,8 +414,8 @@ class DashboardScreenState extends State<DashboardScreen> {
                   padding: const EdgeInsets.all(5),
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      primary: Colors.white,
-                      onPrimary: Colors.black, // foreground
+                      backgroundColor: Colors.white,
+                      foregroundColor: Colors.black, // foreground
                       shadowColor: Color.fromRGBO(0, 0, 0, .5),
                       elevation: 5,
                       alignment: Alignment.bottomLeft,
@@ -437,7 +431,7 @@ class DashboardScreenState extends State<DashboardScreen> {
                         ),
                         Padding(padding: EdgeInsets.all(15)),
                         Text(
-                          AppLocalizations.of(context).setting,
+                          AppLocalizations.of(context)!.setting,
                           style: TextStyle(fontSize: 15, color: Colors.black),
                           textAlign: TextAlign.left,
                         ),

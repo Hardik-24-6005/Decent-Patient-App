@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/auth/providers/auth.dart';
 import 'package:hmz_patient/prescription/screens/user_prescriptions_screen.dart';
@@ -10,27 +9,27 @@ import 'package:http/http.dart' as http;
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class PrescriptionDetails {
-  final String id;
+  final String? id;
   // ignore: non_constant_identifier_names
-  final String patient_name;
-  final String patient_id;
+  final String? patient_name;
+  final String? patient_id;
 
-  final String doctor_name;
-  final String doctor_id;
-  final String date;
-  final String state;
-  final String symptom;
-  final String advice;
-  final String medicine;
-  final String note;
-  final String age;
-  final String gender;
-  final String hospital_title;
-  final String hospital_address;
-  final String hospital_phone;
+  final String? doctor_name;
+  final String? doctor_id;
+  final String? date;
+  final String? state;
+  final String? symptom;
+  final String? advice;
+  final String? medicine;
+  final String? note;
+  final String? age;
+  final String? gender;
+  final String? hospital_title;
+  final String? hospital_address;
+  final String? hospital_phone;
 
   PrescriptionDetails({
     this.id,
@@ -53,13 +52,13 @@ class PrescriptionDetails {
 }
 
 class MedicineDetails {
-  final String id;
-  final String name;
-  final String gram;
-  final String schedule;
+  final String? id;
+  final String? name;
+  final String? gram;
+  final String? schedule;
 
-  final String days;
-  final String time;
+  final String? days;
+  final String? time;
 
   MedicineDetails({
     this.id,
@@ -73,29 +72,21 @@ class MedicineDetails {
 
 class PrescriptionDetailScreen extends StatefulWidget {
   static const routeName = '/prescription-detail';
-  var prescriptionid;
-  String idd;
-  String useridd;
+  final String? prescriptionid;
+  final String idd;
+  final String useridd;
 
-  PrescriptionDetailScreen(this.idd, this.useridd, {this.prescriptionid});
+  const PrescriptionDetailScreen(this.idd, this.useridd, {super.key, this.prescriptionid});
 
   @override
   _PrescriptionDetailScreenState createState() =>
-      _PrescriptionDetailScreenState(
-          this.idd, this.useridd, this.prescriptionid);
+      _PrescriptionDetailScreenState();
 }
 
 class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
-  var prescriptionid;
-  String idd;
-  String useridd;
 
-  List<MedicineDetails> medicines = List();
+  List<MedicineDetails> medicines = [];
   String full_medicine_String = "";
-
-  Future<PrescriptionDetails> prescriptionDetails;
-
-  _PrescriptionDetailScreenState(this.idd, this.useridd, this.prescriptionid);
 
   Future<String> getMedicineByID(var medicineid, var ionid) async {
     // var medicinedata = await http.get(Uri.parse(Auth().linkURL +
@@ -126,8 +117,8 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
       final data = await http.post(
         Uri.parse(url),
         body: {
-          'id': prescriptionid,
-          'user_ion_id': useridd,
+          'id': widget.prescriptionid,
+          'user_ion_id': widget.useridd,
         },
       );
 
@@ -157,7 +148,7 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
           var tempMedicineSortList = sorti.split("***");
 
           String medicinename =
-              await getMedicineByID(tempMedicineSortList[0], useridd);
+              await getMedicineByID(tempMedicineSortList[0], widget.useridd);
 
           MedicineDetails md = new MedicineDetails(
             id: tempMedicineSortList[0],
@@ -235,7 +226,7 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).prescriptionDetail,
+          AppLocalizations.of(context)!.prescriptionDetail,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -292,14 +283,14 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
                         children: [
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).date}: ${response.data.date}"),
+                                "${AppLocalizations.of(context)!.date}: ${response.data.date}"),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).prescriptionId}: ${response.data.id}"),
+                                "${AppLocalizations.of(context)!.prescriptionId}: ${response.data.id}"),
                           ),
                         ],
                       ),
@@ -312,14 +303,14 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
                         children: [
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).patient}: ${response.data.patient_name}"),
+                                "${AppLocalizations.of(context)!.patient}: ${response.data.patient_name}"),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).patientId}: ${response.data.patient_id}"),
+                                "${AppLocalizations.of(context)!.patientId}: ${response.data.patient_id}"),
                           ),
                         ],
                       ),
@@ -332,14 +323,14 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
                         children: [
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).age}: ${response.data.age} "),
+                                "${AppLocalizations.of(context)!.age}: ${response.data.age} "),
                           ),
                           SizedBox(
                             width: 20,
                           ),
                           Container(
                             child: Text(
-                                "${AppLocalizations.of(context).gender}: ${response.data.gender}"),
+                                "${AppLocalizations.of(context)!.gender}: ${response.data.gender}"),
                           ),
                         ],
                       ),
@@ -352,7 +343,7 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
                       width: MediaQuery.of(context).size.width * 1,
                       padding: const EdgeInsets.only(left: 20, right: 20),
                       child: Text(
-                        AppLocalizations.of(context).rx,
+                        AppLocalizations.of(context)!.rx,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -380,7 +371,7 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
                       width: MediaQuery.of(context).size.width * 1,
                       padding: const EdgeInsets.only(left: 20, right: 20),
                       child: Text(
-                        AppLocalizations.of(context).history,
+                        AppLocalizations.of(context)!.history,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -408,7 +399,7 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
                       width: MediaQuery.of(context).size.width * 1,
                       padding: const EdgeInsets.only(left: 20, right: 20),
                       child: Text(
-                        AppLocalizations.of(context).advice,
+                        AppLocalizations.of(context)!.advice,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -436,7 +427,7 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
                       width: MediaQuery.of(context).size.width * 1,
                       padding: const EdgeInsets.only(left: 20, right: 20),
                       child: Text(
-                        AppLocalizations.of(context).note,
+                        AppLocalizations.of(context)!.note,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
@@ -472,7 +463,7 @@ class _PrescriptionDetailScreenState extends State<PrescriptionDetailScreen> {
                                   "__________",
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                Text(AppLocalizations.of(context).signature),
+                                Text(AppLocalizations.of(context)!.signature),
                               ],
                             ),
                           ),

@@ -1,31 +1,28 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/utils/colors.dart';
 import '../home/widgets/bottom_navigation_bar.dart';
 
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'dart:async';
 import 'dart:convert';
 import '../jitsi/jitsi.dart';
-import '../jitsi/jitsi.dart';
 import '../auth/providers/auth.dart';
 import 'appointment.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class AppintmentDetails {
-  final String id;
-  final String patient_name;
-  final String doctor_name;
-  final String date;
-  final String start_time;
-  final String end_time;
-  final String status;
-  final String remarks;
-  final String payment;
-  final String jitsi_link;
+  final String? id;
+  final String? patient_name;
+  final String? doctor_name;
+  final String? date;
+  final String? start_time;
+  final String? end_time;
+  final String? status;
+  final String? remarks;
+  final String? payment;
+  final String? jitsi_link;
 
   AppintmentDetails({
     this.id,
@@ -43,25 +40,22 @@ class AppintmentDetails {
 
 class ShowPatientAppointmentScreen extends StatefulWidget {
   static const routeName = '/showpatientappointmentlist';
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
   ShowPatientAppointmentScreen(this.idd, this.useridd);
   @override
   ShowPatientAppointmentScreenState createState() =>
-      ShowPatientAppointmentScreenState(this.idd, this.useridd);
+      ShowPatientAppointmentScreenState();
 }
 
 class ShowPatientAppointmentScreenState
     extends State<ShowPatientAppointmentScreen> {
-  String idd;
-  String useridd;
-  ShowPatientAppointmentScreenState(this.idd, this.useridd);
-
+  
   List<AppintmentDetails> _tempappointmentlistdata = [];
   List<AppintmentDetails> _appointmentlistdata = [];
   bool erroralllistdata = true;
   Future<List<AppintmentDetails>> _responseFuture() async {
-    String patient_id = this.idd;
+    String patient_id = widget.idd;
 
     // var data = await http.get(Uri.parse(Auth().linkURL +
     //     "api/getMyAllAppoinmentList?group=patient&id=" +
@@ -82,27 +76,29 @@ class ShowPatientAppointmentScreenState
 
       for (var u in jsondata) {
         AppintmentDetails subdata = AppintmentDetails(
-          id: u["id"],
-          patient_name: u["patient_name"],
-          doctor_name: u["doctor_name"],
+          id: u["id"]?.toString(),
+          patient_name: u["patient_name"]?.toString(),
+          doctor_name: u["doctor_name"]?.toString(),
           date: "${u["date"]}",
-          start_time: u["start_time"],
-          end_time: u["end_time"],
-          remarks: u["remarks"],
-          status: u["status"],
-          payment: u["payment"],
-          jitsi_link: u["jitsi_link"],
+          start_time: u["start_time"]?.toString(),
+          end_time: u["end_time"]?.toString(),
+          remarks: u["remarks"]?.toString(),
+          status: u["status"]?.toString(),
+          payment: u["payment"]?.toString(),
+          jitsi_link: u["jitsi_link"]?.toString(),
         );
         _appointmentlistdata.add(subdata);
       }
-      setState(() {
-        _tempappointmentlistdata = _appointmentlistdata;
-        erroralllistdata = false;
-      });
+      if (mounted) {
+        setState(() {
+          _tempappointmentlistdata = _appointmentlistdata;
+          erroralllistdata = false;
+        });
+      }
 
       return _appointmentlistdata;
     } catch (error) {
-      throw error;
+      rethrow;
     }
   }
 
@@ -115,6 +111,7 @@ class ShowPatientAppointmentScreenState
 
   TextEditingController _searchappointment = TextEditingController();
   Future<String> searchallappointmentList(var appointmentdata) async {
+    if (!mounted) return "error";
     setState(() {
       _tempappointmentlistdata = [];
 
@@ -122,9 +119,10 @@ class ShowPatientAppointmentScreenState
         _tempappointmentlistdata = _appointmentlistdata;
       } else {
         for (var item in _appointmentlistdata) {
-          if (item.doctor_name
-              .toLowerCase()
-              .contains(appointmentdata.toString().toLowerCase())) {
+          if (item.doctor_name != null &&
+              item.doctor_name!
+                  .toLowerCase()
+                  .contains(appointmentdata.toString().toLowerCase())) {
             _tempappointmentlistdata.add(item);
           }
         }
@@ -150,7 +148,7 @@ class ShowPatientAppointmentScreenState
           )
         ],
         title: Text(
-          AppLocalizations.of(context).appointmentList,
+          AppLocalizations.of(context)!.appointmentList,
           style: TextStyle(
             color: appcolor.appbartext(),
             fontWeight: appcolor.appbarfontweight(),
@@ -192,8 +190,8 @@ class ShowPatientAppointmentScreenState
                   controller: _searchappointment,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    labelText: AppLocalizations.of(context).searchbydoctorname,
-                    hintText: AppLocalizations.of(context).doctor,
+                    labelText: AppLocalizations.of(context)!.searchbydoctorname,
+                    hintText: AppLocalizations.of(context)!.doctor,
                     prefixIcon: Padding(
                       padding: EdgeInsets.only(top: 20, left: 10, bottom: 20),
                       child: Icon(Icons.search),
@@ -216,7 +214,7 @@ class ShowPatientAppointmentScreenState
                   ? Container(
                       height: MediaQuery.of(context).size.height * .5,
                       child: Center(
-                        child: Text(AppLocalizations.of(context).nodatatoshow),
+                        child: Text(AppLocalizations.of(context)!.nodatatoshow),
                       ),
                     )
                   : Container(
@@ -225,7 +223,7 @@ class ShowPatientAppointmentScreenState
                           physics: ClampingScrollPhysics(),
                           itemCount: _tempappointmentlistdata.length,
                           itemBuilder: (BuildContext context, int index) {
-                            Color statusColor;
+                            Color statusColor = Colors.grey;
                             if (_tempappointmentlistdata[index].status ==
                                 "Confirmed") {
                               statusColor = Colors.green;
@@ -253,7 +251,7 @@ class ShowPatientAppointmentScreenState
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.blue[300].withOpacity(0.1),
+                                    color: Colors.blue[300]!.withValues(alpha: 0.1),
                                     spreadRadius: 2,
                                     blurRadius: 5,
                                     offset: Offset(0, 3),
@@ -293,14 +291,14 @@ class ShowPatientAppointmentScreenState
                                                   child: ElevatedButton(
                                                     style: ButtonStyle(
                                                         padding:
-                                                            MaterialStateProperty.all(
+                                                            WidgetStateProperty.all(
                                                                 EdgeInsets.only(
                                                                     top: 2,
                                                                     bottom: 2)),
                                                         backgroundColor:
-                                                            MaterialStateProperty.all(
+                                                            WidgetStateProperty.all(
                                                                 Colors.white),
-                                                        shape: MaterialStateProperty.all<
+                                                        shape: WidgetStateProperty.all<
                                                                 RoundedRectangleBorder>(
                                                             RoundedRectangleBorder(
                                                                 borderRadius:
@@ -314,24 +312,24 @@ class ShowPatientAppointmentScreenState
                                                             builder: (context) => Jitsi(
                                                                 link: _tempappointmentlistdata[
                                                                         index]
-                                                                    .jitsi_link,
+                                                                    .jitsi_link ?? "",
                                                                 p_name: _tempappointmentlistdata[
                                                                         index]
-                                                                    .patient_name,
+                                                                    .patient_name ?? "",
                                                                 d_name:
                                                                     _tempappointmentlistdata[
                                                                             index]
-                                                                        .doctor_name,
+                                                                        .doctor_name ?? "",
                                                                 d_date:
                                                                     _tempappointmentlistdata[
                                                                             index]
-                                                                        .date,
+                                                                        .date ?? "",
                                                                 s_time: _tempappointmentlistdata[
                                                                         index]
-                                                                    .start_time,
+                                                                    .start_time ?? "",
                                                                 e_time: _tempappointmentlistdata[
                                                                         index]
-                                                                    .end_time)),
+                                                                    .end_time ?? "")),
                                                       );
                                                     },
                                                     child: Icon(
@@ -394,7 +392,7 @@ class ShowPatientAppointmentScreenState
                                                         .width *
                                                     .50,
                                                 child: Text(
-                                                  "${AppLocalizations.of(context).remarks}: ${_tempappointmentlistdata[index].remarks}",
+                                                  "${AppLocalizations.of(context)!.remarks}: ${_tempappointmentlistdata[index].remarks}",
                                                   overflow:
                                                       TextOverflow.visible,
                                                   style: TextStyle(

@@ -5,25 +5,24 @@ import 'package:hmz_patient/auth/providers/auth.dart';
 import 'package:hmz_patient/dashboard/dashboard.dart';
 import 'package:hmz_patient/prescription/screens/prescription_detail_screen.dart';
 import 'package:hmz_patient/utils/colors.dart';
-import 'package:provider/provider.dart';
 import '../../home/widgets/app_drawer.dart';
 
 import 'package:http/http.dart' as http;
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class PrescriptionDetails {
-  final String id;
-  final String patient_name;
-  final String doctor_name;
-  final String date;
-  final String state;
-  final String symptom;
-  final String advice;
-  final String medicine;
-  final String note;
+  final String? id;
+  final String? patient_name;
+  final String? doctor_name;
+  final String? date;
+  final String? state;
+  final String? symptom;
+  final String? advice;
+  final String? medicine;
+  final String? note;
 
   PrescriptionDetails({
     this.id,
@@ -40,24 +39,20 @@ class PrescriptionDetails {
 
 class UserPrescriptionsScreen extends StatefulWidget {
   static const routeName = '/userPrescriptions';
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
 
-  UserPrescriptionsScreen(this.idd, this.useridd);
+  const UserPrescriptionsScreen(this.idd, this.useridd, {super.key});
 
   @override
   _UserPrescriptionsScreenState createState() =>
-      _UserPrescriptionsScreenState(this.idd, this.useridd);
+      _UserPrescriptionsScreenState();
 }
 
 class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
-  String idd;
-  String useridd;
-
-  _UserPrescriptionsScreenState(this.idd, this.useridd);
 
   Future<List<PrescriptionDetails>> _responseFuture() async {
-    String patient_id = this.useridd;
+    String patient_id = widget.useridd;
 
     // var data = await http.get(Uri.parse(Auth().linkURL +
     //     "api/getPatientPrescription?group=patient&id=" +
@@ -109,7 +104,7 @@ class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).yourPresciptions,
+          AppLocalizations.of(context)!.yourPresciptions,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -153,7 +148,7 @@ class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
                               onTap: () {
                                 Navigator.of(context).push(MaterialPageRoute(
                                   builder: (context) =>
-                                      PrescriptionDetailScreen(idd, useridd,
+                                      PrescriptionDetailScreen(widget.idd, widget.useridd,
                                           prescriptionid:
                                               response.data[index].id),
                                 ));
@@ -221,7 +216,7 @@ class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
                                             MediaQuery.of(context).size.width *
                                                 .45,
                                         child: Text(
-                                          "${AppLocalizations.of(context).date}: ${response.data[index].date}",
+                                          "${AppLocalizations.of(context)!.date}: ${response.data[index].date}",
                                           overflow: TextOverflow.visible,
                                           style: TextStyle(
                                             fontSize: 12,
@@ -253,7 +248,7 @@ class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
                                             MediaQuery.of(context).size.width *
                                                 .40,
                                         child: Text(
-                                          "${AppLocalizations.of(context).prescriptionId}:  ${response.data[index].id}",
+                                          "${AppLocalizations.of(context)!.prescriptionId}:  ${response.data[index].id}",
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize: 12,
@@ -282,7 +277,7 @@ class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
                                     children: <Widget>[
                                       // TextButton(
                                       //   child: Text(
-                                      //       AppLocalizations.of(context).view),
+                                      //       AppLocalizations.of(context)!.view),
                                       //   onPressed: () {
                                       //     Navigator.push(
                                       //       context,
@@ -339,7 +334,7 @@ class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
 
 // import 'dart:async';
 // import 'dart:convert';
-// import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+// import 'package:hmz_patient/l10n/app_localizations.dart';
 
 // class PrescriptionDetails {
 //   final String id;
@@ -436,7 +431,7 @@ class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
 //     return Scaffold(
 //       appBar: AppBar(
 //         title: Text(
-//           AppLocalizations.of(context).yourPresciptions,
+//           AppLocalizations.of(context)!.yourPresciptions,
 //           style: TextStyle(
 //               color: appcolor.appbartext(),
 //               fontWeight: appcolor.appbarfontweight()),
@@ -502,7 +497,7 @@ class _UserPrescriptionsScreenState extends State<UserPrescriptionsScreen> {
 //                                     children: <Widget>[
 //                                       TextButton(
 //                                         child: Text(
-//                                             AppLocalizations.of(context).view),
+//                                             AppLocalizations.of(context)!.view),
 //                                         onPressed: () {
 //                                           Navigator.push(
 //                                             context,

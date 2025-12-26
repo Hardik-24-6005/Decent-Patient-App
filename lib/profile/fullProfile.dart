@@ -14,7 +14,7 @@ import 'dart:async';
 import 'dart:convert';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class FullProfile extends StatefulWidget {
   static const routeName = '/fullprofile';
@@ -34,7 +34,7 @@ class FullProfileState extends State<FullProfile> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String url;
+  String? url;
 
   TextEditingController _name = TextEditingController();
   TextEditingController _email = TextEditingController();
@@ -43,8 +43,8 @@ class FullProfileState extends State<FullProfile> {
   TextEditingController _address = TextEditingController();
   TextEditingController _department = TextEditingController();
 
-  List data = new List();
-  String zname;
+  List data = [];
+  String? zname;
   bool _isloading = true;
 
   Future<String> getSWData() async {
@@ -103,7 +103,7 @@ class FullProfileState extends State<FullProfile> {
           if (_isloading == false)
             ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  primary: Colors.transparent,
+                  backgroundColor: Colors.transparent,
                   elevation: 0.0,
                 ),
                 onPressed: () {
@@ -114,7 +114,7 @@ class FullProfileState extends State<FullProfile> {
                   color: appcolor.appbaricontheme(),
                 ),
                 label: Text(
-                  AppLocalizations.of(context).edit,
+                  AppLocalizations.of(context)!.edit,
                   style: TextStyle(color: appcolor.appbaricontheme()),
                 )),
         ],
@@ -129,7 +129,7 @@ class FullProfileState extends State<FullProfile> {
                   child: CircleAvatar(
                     radius: 100,
                     backgroundImage: NetworkImage(
-                        "https://image.flaticon.com/icons/png/512/147/147144.png"),
+                        ""),
                     backgroundColor: Colors.transparent,
                   ),
                 ),
@@ -184,7 +184,7 @@ class FullProfileState extends State<FullProfile> {
                                 const SizedBox(
                                   width: 7,
                                 ),
-                                Text(AppLocalizations.of(context).edit)
+                                Text(AppLocalizations.of(context)!.edit)
                               ],
                             )),
                       ],
@@ -217,7 +217,7 @@ class FullProfileState extends State<FullProfile> {
                                 const SizedBox(
                                   width: 7,
                                 ),
-                                Text(AppLocalizations.of(context).edit)
+                                Text(AppLocalizations.of(context)!.edit)
                               ],
                             )),
                       ],
@@ -250,7 +250,7 @@ class FullProfileState extends State<FullProfile> {
                                 const SizedBox(
                                   width: 7,
                                 ),
-                                Text(AppLocalizations.of(context).edit)
+                                Text(AppLocalizations.of(context)!.edit)
                               ],
                             )),
                       ],

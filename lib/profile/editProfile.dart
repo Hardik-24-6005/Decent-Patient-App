@@ -14,7 +14,7 @@ import 'dart:async';
 import 'dart:convert';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class EditProfile extends StatefulWidget {
   static const routeName = '/editprofile';
@@ -34,7 +34,7 @@ class EditProfileState extends State<EditProfile> {
 
   final _formKey = GlobalKey<FormState>();
 
-  String url;
+  String? url;
 
   TextEditingController _name = TextEditingController();
   TextEditingController _email = TextEditingController();
@@ -43,8 +43,8 @@ class EditProfileState extends State<EditProfile> {
   TextEditingController _address = TextEditingController();
   TextEditingController _department = TextEditingController();
 
-  List data = new List();
-  String zname;
+  List data = [];
+  String? zname;
   bool _isloading = true;
 
   Future<String> getSWData() async {
@@ -53,7 +53,7 @@ class EditProfileState extends State<EditProfile> {
     // var res = await http
     //     .get(Uri.parse(urrr1), headers: {"Accept": "application/json"});
 
-    var res = await http.post(Uri.parse(url), body: {
+    var res = await http.post(Uri.parse(url!), body: {
       'id': useridd,
     }, headers: {
       "Accept": "application/json"
@@ -105,13 +105,13 @@ class EditProfileState extends State<EditProfile> {
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text(
-                  AppLocalizations.of(context).success,
+                  AppLocalizations.of(context)!.success,
                 ),
                 content: Text(
-                    AppLocalizations.of(context).changesUpdatedSuccessfuly),
+                    AppLocalizations.of(context)!.changesUpdatedSuccessfuly),
                 actions: [
-                  FlatButton(
-                    child: Text(AppLocalizations.of(context).ok),
+                  TextButton(
+                    child: Text(AppLocalizations.of(context)!.ok),
                     onPressed: () {
                       Navigator.of(context)
                           .pushReplacementNamed(FullProfile.routeName);
@@ -122,19 +122,20 @@ class EditProfileState extends State<EditProfile> {
             });
 
         return 'success';
-      } else {
+      }
+      else {
         showDialog(
             context: context,
             builder: (BuildContext context) {
               return AlertDialog(
                 title: Text(
-                  AppLocalizations.of(context).failed,
+                  AppLocalizations.of(context)!.failed,
                 ),
                 content: Text(
-                    AppLocalizations.of(context).changesUpdatedNotSuccessfull),
+                    AppLocalizations.of(context)!.changesUpdatedNotSuccessfull),
                 actions: [
-                  FlatButton(
-                    child: Text(AppLocalizations.of(context).ok),
+                  TextButton(
+                    child: Text(AppLocalizations.of(context)!.ok),
                     onPressed: () {
                       Navigator.of(context)
                           .pushReplacementNamed(FullProfile.routeName);
@@ -150,11 +151,11 @@ class EditProfileState extends State<EditProfile> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(AppLocalizations.of(context).invalid),
-              content: Text(AppLocalizations.of(context).invalidInput),
+              title: Text(AppLocalizations.of(context)!.invalid),
+              content: Text(AppLocalizations.of(context)!.invalidInput),
               actions: [
-                FlatButton(
-                  child: Text(AppLocalizations.of(context).ok),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.ok),
                   onPressed: () {
                     Navigator.of(context)
                         .pushReplacementNamed(FullProfile.routeName);
@@ -163,6 +164,8 @@ class EditProfileState extends State<EditProfile> {
               ],
             );
           });
+
+      return "error";
     }
   }
 
@@ -172,7 +175,7 @@ class EditProfileState extends State<EditProfile> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).editProfile,
+          AppLocalizations.of(context)!.editProfile,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -213,12 +216,12 @@ class EditProfileState extends State<EditProfile> {
                                 controller: _name,
                                 decoration: InputDecoration(
                                     labelText:
-                                        AppLocalizations.of(context).name,
+                                        AppLocalizations.of(context)!.name,
                                     hintText:
-                                        AppLocalizations.of(context).enterName),
+                                        AppLocalizations.of(context)!.enterName),
                                 validator: (value) {
-                                  if (value.isEmpty) {
-                                    return AppLocalizations.of(context)
+                                  if (value!.isEmpty) {
+                                    return AppLocalizations.of(context)!
                                         .invalidName;
                                   }
                                   return null;
@@ -237,12 +240,12 @@ class EditProfileState extends State<EditProfile> {
                                 readOnly: true,
                                 decoration: InputDecoration(
                                     labelText:
-                                        '${AppLocalizations.of(context).email} (${AppLocalizations.of(context).notChangable})',
+                                        '${AppLocalizations.of(context)!.email} (${AppLocalizations.of(context)!.notChangable})',
                                     hintText:
-                                        AppLocalizations.of(context).email),
+                                        AppLocalizations.of(context)!.email),
                                 validator: (value) {
-                                  if (value.isEmpty) {
-                                    return AppLocalizations.of(context)
+                                  if (value!.isEmpty) {
+                                    return AppLocalizations.of(context)!
                                         .invalidEmail;
                                   }
                                   return null;
@@ -260,12 +263,12 @@ class EditProfileState extends State<EditProfile> {
                                 controller: _address,
                                 decoration: InputDecoration(
                                     labelText:
-                                        AppLocalizations.of(context).address,
+                                        AppLocalizations.of(context)!.address,
                                     hintText:
-                                        AppLocalizations.of(context).address),
+                                        AppLocalizations.of(context)!.address),
                                 validator: (value) {
-                                  if (value.isEmpty || value.length < 5) {
-                                    return AppLocalizations.of(context)
+                                  if (value!.isEmpty || value.length < 5) {
+                                    return AppLocalizations.of(context)!
                                         .invalidAddress;
                                   }
                                   return null;
@@ -283,12 +286,12 @@ class EditProfileState extends State<EditProfile> {
                                 controller: _phone,
                                 decoration: InputDecoration(
                                     labelText:
-                                        AppLocalizations.of(context).phone,
+                                        AppLocalizations.of(context)!.phone,
                                     hintText:
-                                        AppLocalizations.of(context).phone),
+                                        AppLocalizations.of(context)!.phone),
                                 validator: (value) {
-                                  if (value.isEmpty || value.length < 5) {
-                                    return AppLocalizations.of(context).phone;
+                                  if (value!.isEmpty || value.length < 5) {
+                                    return AppLocalizations.of(context)!.phone;
                                   }
                                   return null;
                                 },
@@ -300,11 +303,11 @@ class EditProfileState extends State<EditProfile> {
                           width: MediaQuery.of(context).size.width * .9,
                           child: ElevatedButton(
                             onPressed: () {
-                              if (_formKey.currentState.validate()) {
+                              if (_formKey.currentState!.validate()) {
                                 updateProfile(context);
                               }
                             },
-                            child: Text(AppLocalizations.of(context).update),
+                            child: Text(AppLocalizations.of(context)!.update),
                           ),
                         )
                       ],

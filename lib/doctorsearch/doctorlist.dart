@@ -1,32 +1,27 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/doctorsearch/doctorappointment.dart';
 import 'package:hmz_patient/doctorsearch/doctordepartment.dart';
 import 'package:hmz_patient/doctorsearch/doctordetail.dart';
 import 'package:hmz_patient/utils/colors.dart';
-import '../home/widgets/bottom_navigation_bar.dart';
 
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'dart:async';
 import 'dart:convert';
-import '../jitsi/jitsi.dart';
-import '../jitsi/jitsi.dart';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class DoctorDetails {
-  final String id;
-  final String img_url;
-  final String name;
-  final String email;
-  final String address;
-  final String phone;
-  final String department;
-  final String profile;
-  final String ion_user_id;
+  final String? id;
+  final String? img_url;
+  final String? name;
+  final String? email;
+  final String? address;
+  final String? phone;
+  final String? department;
+  final String? profile;
+  final String? ion_user_id;
 
   DoctorDetails({
     this.id,
@@ -43,51 +38,29 @@ class DoctorDetails {
 
 class DoctorListScreen extends StatefulWidget {
   static const routeName = '/doctorlist';
-  String idd;
-  String useridd;
-  String departmentname;
+  final String idd;
+  final String useridd;
+  final String? departmentname;
 
   DoctorListScreen(this.idd, this.useridd, {this.departmentname});
   @override
-  DoctorListScreenState createState() =>
-      DoctorListScreenState(this.idd, this.useridd, this.departmentname);
+  DoctorListScreenState createState() => DoctorListScreenState();
 }
 
 class DoctorListScreenState extends State<DoctorListScreen> {
-  String idd;
-  String useridd;
-  String departmentname;
-
-  DoctorListScreenState(this.idd, this.useridd, this.departmentname);
-
   List<DoctorDetails> _tempdoctorlistdata = [];
   List<DoctorDetails> _doctorlistdata = [];
   bool erroralllistdata = true;
 
   Future<List<DoctorDetails>> _responseFuture() async {
-    String patient_id = this.idd;
-
-    // var data = await http.get(Uri.parse(Auth().linkURL +
-    //     "api/getDoctorsByDepartmentname?ion_id=${useridd}&department=" +
-    //     departmentname));
-
     final url = Auth().linkURL + "api/getDoctorsByDepartmentname";
     var data = await http.post(
       Uri.parse(url),
       body: {
-        'ion_id': useridd,
-        'department': departmentname,
+        'ion_id': widget.useridd,
+        'department': widget.departmentname ?? '',
       },
     );
-
-// var data = await http.get(Auth().linkURL +
-//         "api/getDoctorsByDepartmentname?ion_id=${useridd}&department=");
-// var data = await http.get(Auth().linkURL +
-//         "api/getDoctorsByDepartmentname?ion_id=1001&department=4");
-
-    // var data = await http.get(Auth().linkURL +
-    //     "api/getDoctorsByDepartmentname?ion_id="+useridd+"&department=" +
-    //     departmentname);
 
     var jsondata = json.decode(data.body);
 
@@ -106,16 +79,17 @@ class DoctorListScreenState extends State<DoctorListScreen> {
       _doctorlistdata.add(subdata);
     }
     _tempdoctorlistdata = _doctorlistdata;
-    setState(() {
-      erroralllistdata = false;
-    });
+    if (mounted) {
+      setState(() {
+        erroralllistdata = false;
+      });
+    }
     return _doctorlistdata;
   }
 
   @override
   void initState() {
     super.initState();
-
     _responseFuture();
   }
 
@@ -128,7 +102,7 @@ class DoctorListScreenState extends State<DoctorListScreen> {
         _tempdoctorlistdata = _doctorlistdata;
       } else {
         for (var item in _doctorlistdata) {
-          if (item.name
+          if (item.name!
               .toLowerCase()
               .contains(doctordataz.toString().toLowerCase())) {
             _tempdoctorlistdata.add(item);
@@ -144,7 +118,7 @@ class DoctorListScreenState extends State<DoctorListScreen> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-            AppLocalizations.of(context).doctorlist,
+            AppLocalizations.of(context)!.doctorlist,
             style: TextStyle(
                 color: appcolor.appbartext(),
                 fontWeight: appcolor.appbarfontweight()),
@@ -183,8 +157,8 @@ class DoctorListScreenState extends State<DoctorListScreen> {
                     controller: _searchdoctor,
                     decoration: InputDecoration(
                       border: InputBorder.none,
-                      labelText: AppLocalizations.of(context).searchdoctor,
-                      hintText: AppLocalizations.of(context).doctor,
+                      labelText: AppLocalizations.of(context)!.searchdoctor,
+                      hintText: AppLocalizations.of(context)!.doctor,
                       prefixIcon: Padding(
                         padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
                         child: Icon(Icons.search),
@@ -208,7 +182,7 @@ class DoctorListScreenState extends State<DoctorListScreen> {
                         height: MediaQuery.of(context).size.height * .5,
                         child: Center(
                           child:
-                              Text(AppLocalizations.of(context).nodatatoshow),
+                              Text(AppLocalizations.of(context)!.nodatatoshow),
                         ),
                       )
                     : Container(
@@ -246,13 +220,13 @@ class DoctorListScreenState extends State<DoctorListScreen> {
                                           MaterialPageRoute(
                                               builder: (context) =>
                                                   DoctorDetailProfile(
-                                                      idd, useridd,
+                                                      widget.idd, widget.useridd,
                                                       doctorionid:
                                                           _doctorlistdata[index]
-                                                              .ion_user_id,
+                                                              .ion_user_id!,
                                                       doctoruserid:
                                                           _doctorlistdata[index]
-                                                              .id)));
+                                                              .id!)));
                                     },
                                     child: Column(
                                       mainAxisAlignment:
@@ -301,7 +275,7 @@ class DoctorListScreenState extends State<DoctorListScreen> {
                                                             width: 7,
                                                           ),
                                                           Text(AppLocalizations
-                                                                  .of(context)
+                                                                  .of(context)!
                                                               .takeappointment)
                                                         ],
                                                       )),
@@ -317,7 +291,7 @@ class DoctorListScreenState extends State<DoctorListScreen> {
                                                             width: 7,
                                                           ),
                                                           Text(AppLocalizations
-                                                                  .of(context)
+                                                                  .of(context)!
                                                               .profile)
                                                         ],
                                                       )),

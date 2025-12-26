@@ -1,78 +1,61 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/doctorsearch/doctorappointment.dart';
-import 'package:hmz_patient/doctorsearch/doctorlist.dart';
-import 'package:hmz_patient/home/widgets/app_drawer.dart';
 import 'package:hmz_patient/language/provider/language_provider.dart';
 import 'package:hmz_patient/patient/showAppointment.dart';
-import 'package:hmz_patient/profile/changePassword.dart';
-import 'package:hmz_patient/profile/editProfile.dart';
 import 'package:hmz_patient/utils/colors.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../home/widgets/bottom_navigation_bar.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
-import 'package:date_field/date_field.dart';
-import 'package:html/parser.dart';
 import 'package:flutter_html/flutter_html.dart';
 // import 'package:flutter_html/flutter_html.dart';
 import 'dart:async';
 import 'dart:convert';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class DoctorDetailProfile extends StatefulWidget {
   static const routeName = '/doctordetail';
 
-  String idd;
-  String useridd;
-  String doctorionid;
-  String doctoruserid;
+  final String idd;
+  final String useridd;
+  final String? doctorionid;
+  final String? doctoruserid;
 
   DoctorDetailProfile(this.idd, this.useridd,
       {this.doctorionid, this.doctoruserid});
 
   @override
-  DoctorDetailProfileState createState() => DoctorDetailProfileState(
-      this.idd, this.useridd, this.doctorionid, this.doctoruserid);
+  DoctorDetailProfileState createState() => DoctorDetailProfileState();
 }
 
 class DoctorDetailProfileState extends State<DoctorDetailProfile> {
-  String idd;
-  String useridd;
-  String doctorionid;
-  String doctoruserid;
-
-  DoctorDetailProfileState(
-      this.idd, this.useridd, this.doctorionid, this.doctoruserid);
-
   final _formKey = GlobalKey<FormState>();
   var patientlist = "";
 
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
 
-  List<Doctor> doctorDataList = List();
-  List<DropdownMenuItem<Doctor>> dropdownDoctorItems;
-  Doctor selectedDoctor;
+  List<Doctor> doctorDataList = [];
+  List<DropdownMenuItem<Doctor>>? dropdownDoctorItems;
+  Doctor? selectedDoctor;
 
   List<dynamic> doctorSlotList = [];
-  List<DropdownMenuItem> dropdownDoctorSlotItems;
+  List<DropdownMenuItem>? dropdownDoctorSlotItems;
   var selectedDoctorSlot;
 
-  List data2 = List();
+  List data2 = [];
   String availableSlot = '';
   TextEditingController appointmentStatus = TextEditingController();
-  String _patient;
-  DateTime selectedDate;
+  String? _patient;
+  DateTime? selectedDate;
 
   String _date = "";
   TextEditingController _remarks = TextEditingController();
 
-  String url;
+  String? url;
 
   TextEditingController _name = TextEditingController();
   TextEditingController _email = TextEditingController();
@@ -82,8 +65,8 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
   TextEditingController _profile = TextEditingController();
   TextEditingController _doctoruserid = TextEditingController();
 
-  List data = new List();
-  String zname;
+  List data = [];
+  String? zname;
 
   bool _isloadingPatient = true;
 
@@ -97,7 +80,7 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
     var res = await http.post(
       Uri.parse(url),
       body: {
-        'id': doctorionid,
+        'id': widget.doctorionid,
       },
     );
 
@@ -135,8 +118,8 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
 
   // get doctor slot data
   List<dynamic> buildDoctorSlotItems(List doctorslot) {
-    List<String> itemss = List();
-    doctorSlotList = new List();
+    List<String> itemss = [];
+    doctorSlotList = [];
     for (var zdoctor in doctorslot) {
       doctorSlotList
           .add([zdoctor['s_time'] + " To " + zdoctor['e_time'], false]);
@@ -177,7 +160,7 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
       Uri.parse(posturl),
       body: {
         'patient': this._patient,
-        'doctor': this.doctoruserid,
+        'doctor': widget.doctoruserid,
         'date': this._date,
         'status': this.appointmentStatus.text,
         'time_slot': this.availableSlot,
@@ -194,12 +177,12 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(AppLocalizations.of(context).success),
+              title: Text(AppLocalizations.of(context)!.success),
               content:
-                  Text(AppLocalizations.of(context).appointmentCreatedMessage),
+                  Text(AppLocalizations.of(context)!.appointmentCreatedMessage),
               actions: [
-                FlatButton(
-                  child: Text(AppLocalizations.of(context).ok),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.ok),
                   onPressed: () {
                     Navigator.of(context).pushReplacementNamed(
                         ShowPatientAppointmentScreen.routeName);
@@ -222,7 +205,7 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
     getDoctorProfileData();
     setState(() {});
 
-    _patient = this.idd;
+    _patient = widget.idd;
     appointmentStatus = new TextEditingController(text: 'Requested');
   }
 
@@ -236,7 +219,7 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).doctordetail,
+          AppLocalizations.of(context)!.doctordetail,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -438,23 +421,23 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
                                                 padding:
                                                     const EdgeInsets.all(0),
                                                 child: TextButton(
-                                                  style: (doctorSlotList[index]
-                                                              [1] ==
-                                                          true)
-                                                      ? ButtonStyle(
-                                                          backgroundColor:
-                                                              MaterialStateProperty
-                                                                  .all(Theme.of(
-                                                                          context)
-                                                                      .primaryColor),
-                                                        )
-                                                      : ButtonStyle(
-                                                          backgroundColor:
-                                                              MaterialStateProperty
-                                                                  .all(Colors
-                                                                      .amberAccent),
-                                                        ),
-                                                  onPressed: () {
+                                                style: (doctorSlotList[index]
+                                                            [1] ==
+                                                        true)
+                                                    ? ButtonStyle(
+                                                        backgroundColor:
+                                                            WidgetStateProperty
+                                                                .all(Theme.of(
+                                                                        context)
+                                                                    .primaryColor),
+                                                      )
+                                                    : ButtonStyle(
+                                                        backgroundColor:
+                                                            WidgetStateProperty
+                                                                .all(Colors
+                                                                    .amberAccent),
+                                                      ),
+                                                onPressed: () {
                                                     setState(() {
                                                       for (var listdatas = 0;
                                                           listdatas <
@@ -503,7 +486,7 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
                                             padding: EdgeInsets.only(
                                                 top: 10, left: 10),
                                             child: Text(
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .noslots),
                                           ),
                                   ),
@@ -531,23 +514,22 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
                                   child: Theme(
                                     data: theme.copyWith(
                                       primaryColor: Colors.black,
-                                      backgroundColor: Colors.black,
                                     ),
                                     child: TextFormField(
                                       controller: _remarks,
                                       decoration: InputDecoration(
-                                        labelText: AppLocalizations.of(context)
+                                        labelText: AppLocalizations.of(context)!
                                             .remarks,
                                         labelStyle: TextStyle(
                                           color: Colors.black,
                                         ),
-                                        hintText: AppLocalizations.of(context)
+                                        hintText: AppLocalizations.of(context)!
                                             .giveYourRemarks,
                                         border: UnderlineInputBorder(),
                                       ),
                                       validator: (value) {
-                                        if (value.isEmpty) {
-                                          return AppLocalizations.of(context)
+                                        if (value == null || value.isEmpty) {
+                                          return AppLocalizations.of(context)!
                                               .invalidInput;
                                         }
                                         return null;
@@ -560,18 +542,16 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
                             Container(
                               width: MediaQuery.of(context).size.width * .9,
                               child: Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 16.0),
-                                child: ElevatedButton(
-                                  style: ButtonStyle(
-                                      backgroundColor:
-                                          MaterialStateProperty.all(
-                                              Theme.of(context).primaryColor)),
-                                  onPressed: () {
-                                    if (_formKey.currentState.validate()) {
-                                      if (_formKey.currentState.validate()) {
-                                        if (availableSlot == "" ||
-                                            availableSlot == null) {
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 16.0),
+                                  child: ElevatedButton(
+                                    style: ButtonStyle(
+                                        backgroundColor:
+                                            WidgetStateProperty.all(
+                                                Theme.of(context).primaryColor)),
+                                    onPressed: () {
+                                      if (_formKey.currentState!.validate()) {
+                                        if (availableSlot == "") {
                                           setState(() {
                                             errordoctorslotselect = true;
                                           });
@@ -579,12 +559,11 @@ class DoctorDetailProfileState extends State<DoctorDetailProfile> {
                                           makeAppointment(context);
                                         }
                                       }
-                                    }
-                                  },
-                                  child: Text(AppLocalizations.of(context)
-                                      .appointmentRequest),
+                                    },
+                                    child: Text(AppLocalizations.of(context)!
+                                        .appointmentRequest),
+                                  ),
                                 ),
-                              ),
                             ),
                           ],
                         ),

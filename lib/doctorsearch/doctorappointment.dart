@@ -19,13 +19,13 @@ import 'dart:convert';
 
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class Doctor {
-  final String id;
-  final String image;
-  final String name;
+  final String? id;
+  final String? image;
+  final String? name;
 
   Doctor({
     this.id,
@@ -44,46 +44,41 @@ class Doctor {
 class AppointmentFromDoctorScreen extends StatefulWidget {
   static const routeName = '/doctorappointment';
 
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
   AppointmentFromDoctorScreen(this.idd, this.useridd);
 
   @override
   AppointmentFromDoctorScreenScreenState createState() =>
-      AppointmentFromDoctorScreenScreenState(this.idd, this.useridd);
+      AppointmentFromDoctorScreenScreenState();
 }
 
-class AppointmentFromDoctorScreenScreenState
-    extends State<AppointmentFromDoctorScreen> {
-  String idd;
-  String useridd;
-
-  AppointmentFromDoctorScreenScreenState(this.idd, this.useridd);
+class AppointmentFromDoctorScreenScreenState extends State<AppointmentFromDoctorScreen> {
 
   final _formKey = GlobalKey<FormState>();
-  String _ddoctor;
-  String _ddoctorId;
+  String? _ddoctor;
+  String? _ddoctorId;
   var patientlist = "";
 
   DateTime _selectedDay = DateTime.now();
   DateTime _focusedDay = DateTime.now();
 
-  String url;
+  String url = "";
 
-  List<Doctor> doctorDataList = List();
-  List<DropdownMenuItem<Doctor>> dropdownDoctorItems;
-  Doctor selectedDoctor;
+  List<Doctor> doctorDataList = [];
+  List<DropdownMenuItem<Doctor>>? dropdownDoctorItems;
+  Doctor? selectedDoctor;
 
   List<String> doctorSlotList = [];
-  List<DropdownMenuItem> dropdownDoctorSlotItems;
+  List<DropdownMenuItem>? dropdownDoctorSlotItems;
   var selectedDoctorSlot;
 
-  List data2 = List();
+  List data2 = [];
   List data3 = ['Confirmed', 'Pending', 'Requested'];
   String availableSlot = '';
   TextEditingController appointmentStatus = TextEditingController();
-  String _patient;
-  DateTime selectedDate;
+  String? _patient;
+  DateTime? selectedDate;
 
   bool _isloading = true;
 
@@ -91,8 +86,8 @@ class AppointmentFromDoctorScreenScreenState
   TextEditingController _remarks = TextEditingController();
 
   List<String> buildDoctorSlotItems(List doctorslot) {
-    List<String> itemss = List();
-    doctorSlotList = new List();
+    List<String> itemss = [];
+    doctorSlotList = [];
     for (var zdoctor in doctorslot) {
       doctorSlotList.add(
         zdoctor['s_time'] + " To " + zdoctor['e_time'],
@@ -107,7 +102,7 @@ class AppointmentFromDoctorScreenScreenState
   }
 
   List<DropdownMenuItem> buildDoctorSlotMenuItems(List doctorslot) {
-    List<DropdownMenuItem> itemss = List();
+    List<DropdownMenuItem> itemss = [];
     for (var zdoctor in doctorslot) {
       itemss.add(DropdownMenuItem(
           value: zdoctor['s_time'] + " To " + zdoctor['e_time'],
@@ -139,25 +134,27 @@ class AppointmentFromDoctorScreenScreenState
   }
 
   List<DropdownMenuItem<Doctor>> buildDoctorMenuItems(List doctors) {
-    List<DropdownMenuItem<Doctor>> itemss = List();
+    List<DropdownMenuItem<Doctor>> itemss = [];
     for (Doctor zdoctor in doctors) {
-      itemss.add(DropdownMenuItem(value: zdoctor, child: Text(zdoctor.name)));
+      itemss.add(DropdownMenuItem(value: zdoctor, child: Text(zdoctor.name!)));
     }
     return itemss;
   }
 
-  onchangedDropdownDoctorItem(Doctor selectedDoctor1) {
+  onchangedDropdownDoctorItem(Doctor? selectedDoctor1) {
     setState(() {
       selectedDoctor = selectedDoctor1;
-      _ddoctor = selectedDoctor.id;
+      if (selectedDoctor != null) {
+        _ddoctor = selectedDoctor!.id;
 
-      if (_date != "") {
-        String getslot = Auth().linkURL +
-            'api/getDoctorTimeSlop?doctor_id=' +
-            _ddoctor +
-            '&date=' +
-            this._date;
-        getDoctorSlot(getslot);
+        if (_date != "") {
+          String getslot = Auth().linkURL +
+              'api/getDoctorTimeSlop?doctor_id=' +
+              _ddoctor! +
+              '&date=' +
+              this._date;
+          getDoctorSlot(getslot);
+        }
       }
     });
   }
@@ -203,12 +200,12 @@ class AppointmentFromDoctorScreenScreenState
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text(AppLocalizations.of(context).success),
+              title: Text(AppLocalizations.of(context)!.success),
               content:
-                  Text(AppLocalizations.of(context).appointmentCreatedMessage),
+                  Text(AppLocalizations.of(context)!.appointmentCreatedMessage),
               actions: [
-                FlatButton(
-                  child: Text(AppLocalizations.of(context).ok),
+                TextButton(
+                  child: Text(AppLocalizations.of(context)!.ok),
                   onPressed: () {
                     Navigator.of(context)
                         .pushReplacementNamed(DoctorListScreen.routeName);
@@ -230,11 +227,11 @@ class AppointmentFromDoctorScreenScreenState
   void initState() {
     super.initState();
 
-    url = Auth().linkURL + "api/getDoctorList?id=${this.useridd}";
+    url = Auth().linkURL + "api/getDoctorList?id=${widget.useridd}";
 
     this.getSWData();
 
-    _patient = this.idd;
+    _patient = widget.idd;
     appointmentStatus = new TextEditingController(text: 'Requested');
   }
 
@@ -283,15 +280,15 @@ class AppointmentFromDoctorScreenScreenState
                         decoration: BoxDecoration(
                             border: Border(
                           bottom:
-                              BorderSide(width: 1.5, color: Colors.blue[100]),
+                              BorderSide(width: 1.5, color: Colors.blue[100]!),
                         )),
-                        child: new DropdownButtonFormField(
+                        child: new DropdownButtonFormField<Doctor>(
                           decoration: InputDecoration(
-                              labelText: AppLocalizations.of(context).doctor,
+                              labelText: AppLocalizations.of(context)!.doctor,
                               border: InputBorder.none),
                           value: selectedDoctor,
                           items: dropdownDoctorItems,
-                          onChanged: (zval) {
+                          onChanged: (Doctor? zval) {
                             onchangedDropdownDoctorItem(zval);
                           },
                         ),
@@ -318,7 +315,7 @@ class AppointmentFromDoctorScreenScreenState
 
                               String getslot = Auth().linkURL +
                                   'api/getDoctorTimeSlop?doctor_id=' +
-                                  _ddoctor +
+                                  _ddoctor! +
                                   '&date=' +
                                   formattedDate;
                               getDoctorSlot(getslot);
@@ -332,7 +329,7 @@ class AppointmentFromDoctorScreenScreenState
                             isTodayHighlighted: false,
                             cellMargin: EdgeInsets.all(5),
                             selectedDecoration: BoxDecoration(
-                              color: Colors.orange[800].withOpacity(.7),
+                              color: Colors.orange[800]!.withOpacity(.7),
                               shape: BoxShape.circle,
                             ),
                             selectedTextStyle: TextStyle(
@@ -365,9 +362,9 @@ class AppointmentFromDoctorScreenScreenState
                             decoration: BoxDecoration(
                                 border: Border(
                               top: BorderSide(
-                                  width: 1, color: Colors.amber[200]),
+                                  width: 1, color: Colors.amber[200]!),
                               bottom: BorderSide(
-                                  width: 1, color: Colors.amber[200]),
+                                  width: 1, color: Colors.amber[200]!),
                             )),
                             child: Scrollbar(
                               child: GridView.builder(
@@ -427,7 +424,7 @@ class AppointmentFromDoctorScreenScreenState
                             decoration: BoxDecoration(
                                 border: Border(
                               bottom: BorderSide(
-                                  width: 1.5, color: Colors.blue[100]),
+                                  width: 1.5, color: Colors.blue[100]!),
                             )),
                             child: Theme(
                               data: theme.copyWith(primaryColor: Colors.blue),
@@ -435,13 +432,13 @@ class AppointmentFromDoctorScreenScreenState
                                 controller: _remarks,
                                 decoration: InputDecoration(
                                     labelText:
-                                        AppLocalizations.of(context).remarks,
-                                    hintText: AppLocalizations.of(context)
+                                        AppLocalizations.of(context)!.remarks,
+                                    hintText: AppLocalizations.of(context)!
                                         .giveYourRemarks,
                                     border: InputBorder.none),
                                 validator: (value) {
-                                  if (value.isEmpty) {
-                                    return AppLocalizations.of(context)
+                                  if (value!.isEmpty) {
+                                    return AppLocalizations.of(context)!
                                         .invalidInput;
                                   }
                                   return null;
@@ -457,7 +454,7 @@ class AppointmentFromDoctorScreenScreenState
                           padding: const EdgeInsets.symmetric(vertical: 16.0),
                           child: ElevatedButton(
                             onPressed: () {
-                              if (_formKey.currentState.validate()) {
+                              if (_formKey.currentState!.validate()) {
                                 if (_firstclick) {
                                   _firstclick = false;
                                   makeAppointment(context);
@@ -467,15 +464,15 @@ class AppointmentFromDoctorScreenScreenState
                                     context: context,
                                     builder: (BuildContext context) {
                                       return AlertDialog(
-                                        title: Text(AppLocalizations.of(context)
+                                        title: Text(AppLocalizations.of(context)!
                                             .invalid),
                                         content: Text(
-                                            AppLocalizations.of(context)
+                                            AppLocalizations.of(context)!
                                                 .pleaseEnterValidInput),
                                         actions: [
-                                          FlatButton(
+                                          TextButton(
                                             child: Text(
-                                                AppLocalizations.of(context)
+                                                AppLocalizations.of(context)!
                                                     .ok),
                                             onPressed: () {
                                               Navigator.of(context).pop();
@@ -486,7 +483,7 @@ class AppointmentFromDoctorScreenScreenState
                                     });
                               }
                             },
-                            child: Text(AppLocalizations.of(context).save),
+                            child: Text(AppLocalizations.of(context)!.save),
                           ),
                         ),
                       ),

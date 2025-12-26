@@ -18,7 +18,7 @@ class LanguageProvider extends ChangeNotifier{
 
   void clearLocale(){
 
-    _locale = null;
+    // _locale = null;
     notifyListeners();
 
   }

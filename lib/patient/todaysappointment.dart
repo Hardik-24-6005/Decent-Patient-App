@@ -1,28 +1,25 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/auth/providers/auth.dart';
-import 'package:hmz_patient/home/widgets/app_drawer.dart';
 import 'package:hmz_patient/utils/colors.dart';
 import '../home/widgets/bottom_navigation_bar.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'dart:async';
 import 'dart:convert';
 import '../jitsi/jitsi.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class AppintmentDetails {
-  final String id;
-  final String patient_name;
-  final String doctor_name;
-  final String date;
-  final String start_time;
-  final String end_time;
-  final String status;
-  final String remarks;
-  final String jitsi_link;
+  final String? id;
+  final String? patient_name;
+  final String? doctor_name;
+  final String? date;
+  final String? start_time;
+  final String? end_time;
+  final String? status;
+  final String? remarks;
+  final String? jitsi_link;
 
   AppintmentDetails({
     this.id,
@@ -40,24 +37,22 @@ class AppintmentDetails {
 class ShowTodaysAppointmentScreen extends StatefulWidget {
   static const routeName = '/ShowTodaysAppointmentlist';
 
-  String idd;
+  final String idd;
   ShowTodaysAppointmentScreen(this.idd);
 
   @override
   ShowTodaysAppointmentScreenState createState() =>
-      ShowTodaysAppointmentScreenState(this.idd);
+      ShowTodaysAppointmentScreenState();
 }
 
 class ShowTodaysAppointmentScreenState
     extends State<ShowTodaysAppointmentScreen> {
-  String idd;
-  ShowTodaysAppointmentScreenState(this.idd);
-
+  
   List<AppintmentDetails> _tempappointmentlistdata = [];
   List<AppintmentDetails> _appointmentlistdata = [];
   bool erroralllistdata = true;
   Future<List<AppintmentDetails>> _responseFuture() async {
-    final doctor_id = this.idd;
+    final doctor_id = widget.idd;
 
     // var data = await http.get(Uri.parse(Auth().linkURL +
     //     "api/getMyTodaysAppoinmentList?group=patient&id=" +
@@ -74,22 +69,22 @@ class ShowTodaysAppointmentScreenState
     );
 
     var jsondata = json.decode(data.body);
-    List<AppintmentDetails> _lcdata = [];
 
     for (var u in jsondata) {
       AppintmentDetails subdata = AppintmentDetails(
-        id: u["id"],
-        patient_name: u["patient_name"],
-        doctor_name: u["doctor_name"],
-        date: u["date"],
-        start_time: u["start_time"],
-        end_time: u["end_time"],
-        remarks: u["remarks"],
-        status: u["status"],
-        jitsi_link: u["jitsi_link"],
+        id: u["id"]?.toString(),
+        patient_name: u["patient_name"]?.toString(),
+        doctor_name: u["doctor_name"]?.toString(),
+        date: u["date"]?.toString(),
+        start_time: u["start_time"]?.toString(),
+        end_time: u["end_time"]?.toString(),
+        remarks: u["remarks"]?.toString(),
+        status: u["status"]?.toString(),
+        jitsi_link: u["jitsi_link"]?.toString(),
       );
       _appointmentlistdata.add(subdata);
     }
+    if (!mounted) return _appointmentlistdata;
     setState(() {
       _tempappointmentlistdata = _appointmentlistdata;
       erroralllistdata = false;
@@ -107,6 +102,7 @@ class ShowTodaysAppointmentScreenState
 
   TextEditingController _searchappointment = TextEditingController();
   Future<String> searchallappointmentList(var appointmentdata) async {
+    if (!mounted) return "error";
     setState(() {
       _tempappointmentlistdata = [];
 
@@ -114,7 +110,7 @@ class ShowTodaysAppointmentScreenState
         _tempappointmentlistdata = _appointmentlistdata;
       } else {
         for (var item in _appointmentlistdata) {
-          if (item.doctor_name
+          if ((item.doctor_name ?? "")
               .toLowerCase()
               .contains(appointmentdata.toString().toLowerCase())) {
             _tempappointmentlistdata.add(item);
@@ -131,7 +127,7 @@ class ShowTodaysAppointmentScreenState
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).todaysAppointment,
+          AppLocalizations.of(context)!.todaysAppointment,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -169,8 +165,8 @@ class ShowTodaysAppointmentScreenState
                   controller: _searchappointment,
                   decoration: InputDecoration(
                     border: InputBorder.none,
-                    labelText: AppLocalizations.of(context).searchbydoctorname,
-                    hintText: AppLocalizations.of(context).doctor,
+                    labelText: AppLocalizations.of(context)!.searchbydoctorname,
+                    hintText: AppLocalizations.of(context)!.doctor,
                     prefixIcon: Padding(
                       padding: EdgeInsets.only(top: 10, left: 10, bottom: 10),
                       child: Icon(Icons.search),
@@ -193,7 +189,7 @@ class ShowTodaysAppointmentScreenState
                   ? Container(
                       height: MediaQuery.of(context).size.height * .5,
                       child: Center(
-                        child: Text(AppLocalizations.of(context).nodatatoshow),
+                        child: Text(AppLocalizations.of(context)!.nodatatoshow),
                       ),
                     )
                   : Container(
@@ -202,7 +198,7 @@ class ShowTodaysAppointmentScreenState
                           physics: ClampingScrollPhysics(),
                           itemCount: _tempappointmentlistdata.length,
                           itemBuilder: (BuildContext context, int index) {
-                            Color statusColor;
+                            Color statusColor = Colors.grey;
                             if (_tempappointmentlistdata[index].status ==
                                 "Confirmed") {
                               statusColor = Colors.green;
@@ -230,7 +226,7 @@ class ShowTodaysAppointmentScreenState
                                 borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.blue[300].withOpacity(0.1),
+                                    color: Colors.blue[300]!.withValues(alpha: 0.1),
                                     spreadRadius: 2,
                                     blurRadius: 5,
                                     offset: Offset(0, 3),
@@ -270,14 +266,14 @@ class ShowTodaysAppointmentScreenState
                                                   child: ElevatedButton(
                                                     style: ButtonStyle(
                                                         padding:
-                                                            MaterialStateProperty.all(
+                                                            WidgetStateProperty.all(
                                                                 EdgeInsets.only(
                                                                     top: 2,
                                                                     bottom: 2)),
                                                         backgroundColor:
-                                                            MaterialStateProperty.all(
+                                                            WidgetStateProperty.all(
                                                                 Colors.white),
-                                                        shape: MaterialStateProperty.all<
+                                                        shape: WidgetStateProperty.all<
                                                                 RoundedRectangleBorder>(
                                                             RoundedRectangleBorder(
                                                                 borderRadius:
@@ -291,24 +287,24 @@ class ShowTodaysAppointmentScreenState
                                                             builder: (context) => Jitsi(
                                                                 link: _tempappointmentlistdata[
                                                                         index]
-                                                                    .jitsi_link,
+                                                                    .jitsi_link ?? "",
                                                                 p_name: _tempappointmentlistdata[
                                                                         index]
-                                                                    .patient_name,
+                                                                    .patient_name ?? "",
                                                                 d_name:
                                                                     _tempappointmentlistdata[
                                                                             index]
-                                                                        .doctor_name,
+                                                                        .doctor_name ?? "",
                                                                 d_date:
                                                                     _tempappointmentlistdata[
                                                                             index]
-                                                                        .date,
+                                                                        .date ?? "",
                                                                 s_time: _tempappointmentlistdata[
                                                                         index]
-                                                                    .start_time,
+                                                                    .start_time ?? "",
                                                                 e_time: _tempappointmentlistdata[
                                                                         index]
-                                                                    .end_time)),
+                                                                    .end_time ?? "")),
                                                       );
                                                     },
                                                     child: Icon(
@@ -371,7 +367,7 @@ class ShowTodaysAppointmentScreenState
                                                         .width *
                                                     .50,
                                                 child: Text(
-                                                  "${AppLocalizations.of(context).remarks}: ${_tempappointmentlistdata[index].remarks}",
+                                                  "${AppLocalizations.of(context)!.remarks}: ${_tempappointmentlistdata[index].remarks}",
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: TextStyle(

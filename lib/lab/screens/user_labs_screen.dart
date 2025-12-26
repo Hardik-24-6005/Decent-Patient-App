@@ -1,14 +1,9 @@
 // ignore_for_file: unused_local_variable
 
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/auth/providers/auth.dart';
 import 'package:hmz_patient/dashboard/dashboard.dart';
-import 'package:hmz_patient/prescription/screens/prescription_detail_screen.dart';
 import 'package:hmz_patient/utils/colors.dart';
-import 'package:provider/provider.dart';
 import '../../home/widgets/app_drawer.dart';
 import 'package:hmz_patient/lab/screens/lab_detail_screen.dart';
 
@@ -16,24 +11,24 @@ import 'package:http/http.dart' as http;
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class LabDetails {
-  final String id;
-  final String patient_name;
-  final String patient_id;
-  final String doctor_name;
-  final String date;
-  final String report;
-  final String test_name;
-  final String test_status;
-  final String status;
-  final String age;
-  final String gender;
-  final String hospital_title;
-  final String hospital_address;
-  final String hospital_phone;
-  final Color reportStatusColor;
+  final String? id;
+  final String? patient_name;
+  final String? patient_id;
+  final String? doctor_name;
+  final String? date;
+  final String? report;
+  final String? test_name;
+  final String? test_status;
+  final String? status;
+  final String? age;
+  final String? gender;
+  final String? hospital_title;
+  final String? hospital_address;
+  final String? hospital_phone;
+  final Color? reportStatusColor;
 
   LabDetails({
     this.id,
@@ -56,8 +51,8 @@ class LabDetails {
 
 class LabListScreen extends StatefulWidget {
   static const routeName = '/userLabs';
-  String idd;
-  String useridd;
+  final String idd;
+  final String useridd;
 
   LabListScreen(this.idd, this.useridd);
 
@@ -124,7 +119,7 @@ class _LabListScreenState extends State<LabListScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).labReports,
+          AppLocalizations.of(context)!.labReports,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -274,7 +269,7 @@ class _LabListScreenState extends State<LabListScreen> {
                                             MediaQuery.of(context).size.width *
                                                 .45,
                                         child: Text(
-                                          "${AppLocalizations.of(context).date}: ${response.data[index].date}",
+                                          "${AppLocalizations.of(context)!.date}: ${response.data[index].date}",
                                           overflow: TextOverflow.visible,
                                           style: TextStyle(
                                             fontSize: 12,
@@ -306,7 +301,7 @@ class _LabListScreenState extends State<LabListScreen> {
                                             MediaQuery.of(context).size.width *
                                                 .20,
                                         child: Text(
-                                          "${AppLocalizations.of(context).labId}:  ${response.data[index].id}",
+                                          "${AppLocalizations.of(context)!.labId}:  ${response.data[index].id}",
                                           overflow: TextOverflow.ellipsis,
                                           style: TextStyle(
                                             fontSize: 12,

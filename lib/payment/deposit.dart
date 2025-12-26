@@ -1,48 +1,21 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hmz_patient/utils/colors.dart';
 import '../home/widgets/bottom_navigation_bar.dart';
-import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 
 import 'dart:async';
 import 'dart:convert';
-import '../jitsi/jitsi.dart';
 import 'addPayment.dart';
 import '../auth/providers/auth.dart';
 
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-
-class PaymentDetails {
-  final String id;
-  final String patient_name;
-  final String doctor_name;
-  final String date;
-  final String start_time;
-  final String end_time;
-  final String status;
-  final String remarks;
-  final String jitsi_link;
-
-  PaymentDetails({
-    this.id,
-    this.patient_name,
-    this.doctor_name,
-    this.date,
-    this.start_time,
-    this.end_time,
-    this.remarks,
-    this.status,
-    this.jitsi_link,
-  });
-}
+import 'package:hmz_patient/l10n/app_localizations.dart';
 
 class DepositedAmount {
-  final String id;
-  final String patient_id;
-  final String deposited_amount;
-  final String date;
-  final String payment_id;
+  final String? id;
+  final String? patient_id;
+  final String? deposited_amount;
+  final String? date;
+  final String? payment_id;
 
   DepositedAmount({
     this.id,
@@ -55,23 +28,18 @@ class DepositedAmount {
 
 class DepositPayment extends StatefulWidget {
   static const routeName = '/depositpayment';
-  String id;
-  String userid;
-  DepositPayment(this.id, this.userid);
+  final String id;
+  final String userid;
+  const DepositPayment(this.id, this.userid, {super.key});
 
   @override
-  DepositPaymentState createState() =>
-      DepositPaymentState(this.id, this.userid);
+  DepositPaymentState createState() => DepositPaymentState();
 }
 
 class DepositPaymentState extends State<DepositPayment> {
-  String idd;
-  String userid;
-  String total;
-  String deposit;
-  String due;
-
-  DepositPaymentState(this.idd, this.userid);
+  String? total;
+  String? deposit;
+  String? due;
 
   Future<List<DepositedAmount>> getPatientdeposit() async {
     String posturl = Auth().linkURL + "api/getPatientDeposit";
@@ -79,8 +47,8 @@ class DepositPaymentState extends State<DepositPayment> {
     final res = await http.post(
       Uri.parse(posturl),
       body: {
-        'id': this.idd,
-        'ion_id': this.userid,
+        'id': widget.id,
+        'ion_id': widget.userid,
       },
     );
 
@@ -93,11 +61,11 @@ class DepositPaymentState extends State<DepositPayment> {
       var datesss = "${datess.day}-${datess.month}-${datess.year}";
 
       DepositedAmount subdata = DepositedAmount(
-        id: u["id"],
-        patient_id: u["patient"],
-        deposited_amount: u["deposited_amount"],
+        id: u["id"]?.toString(),
+        patient_id: u["patient"]?.toString(),
+        deposited_amount: u["deposited_amount"]?.toString(),
         date: datesss,
-        payment_id: u["payment_id"],
+        payment_id: u["payment_id"]?.toString(),
       );
       _depositedamount.add(subdata);
     }
@@ -111,21 +79,23 @@ class DepositPaymentState extends State<DepositPayment> {
     final res = await http.post(
       Uri.parse(posturl),
       body: {
-        'id': this.idd,
-        'ion_id': this.userid,
+        'id': widget.id,
+        'ion_id': widget.userid,
       },
     );
 
     var jsondata = json.decode(res.body);
 
-    setState(() {
-      var ss = jsondata["total"];
-      var ss2 = jsondata["deposit"];
-      var ss3 = jsondata["due"];
-      this.total = "$ss";
-      this.deposit = "$ss2";
-      this.due = "$ss3";
-    });
+    if (mounted) {
+      setState(() {
+        var ss = jsondata["total"];
+        var ss2 = jsondata["deposit"];
+        var ss3 = jsondata["due"];
+        this.total = "$ss";
+        this.deposit = "$ss2";
+        this.due = "$ss3";
+      });
+    }
   }
 
   @override
@@ -135,13 +105,14 @@ class DepositPaymentState extends State<DepositPayment> {
     gettotalamount();
   }
 
-  AppColor appcolor = new AppColor();
+  AppColor appcolor = AppColor();
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          AppLocalizations.of(context).deposit,
+          AppLocalizations.of(context)!.deposit,
           style: TextStyle(
               color: appcolor.appbartext(),
               fontWeight: appcolor.appbarfontweight()),
@@ -162,14 +133,14 @@ class DepositPaymentState extends State<DepositPayment> {
         actions: <Widget>[
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              primary: Colors.transparent,
+              backgroundColor: Colors.transparent,
               elevation: 0.0,
             ),
             onPressed: () {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => AddPaymentScreen(this.idd)));
+                      builder: (context) => AddPaymentScreen(widget.id)));
             },
             icon: Icon(
               Icons.add_rounded,
@@ -179,9 +150,9 @@ class DepositPaymentState extends State<DepositPayment> {
         ],
       ),
       body: Container(
-        child: new FutureBuilder(
+        child: FutureBuilder<List<DepositedAmount>>(
           future: getPatientdeposit(),
-          builder: (BuildContext context, AsyncSnapshot response2) {
+          builder: (BuildContext context, AsyncSnapshot<List<DepositedAmount>> response2) {
             if (response2.data == null) {
               return Container(
                 child: Center(child: CircularProgressIndicator()),
@@ -202,14 +173,14 @@ class DepositPaymentState extends State<DepositPayment> {
                           color: Colors.orange,
                           child: ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Colors.blue.withOpacity(.5)),
+                              backgroundColor: WidgetStateProperty.all(
+                                  Colors.blue.withValues(alpha: .5)),
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  AppLocalizations.of(context).totalAmount,
+                                  AppLocalizations.of(context)!.totalAmount,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -234,14 +205,14 @@ class DepositPaymentState extends State<DepositPayment> {
                           color: Colors.orange,
                           child: ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Colors.blue.withOpacity(.5)),
+                              backgroundColor: WidgetStateProperty.all(
+                                  Colors.blue.withValues(alpha: .5)),
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  AppLocalizations.of(context).totalDeposit,
+                                  AppLocalizations.of(context)!.totalDeposit,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -266,14 +237,14 @@ class DepositPaymentState extends State<DepositPayment> {
                           color: Colors.orange,
                           child: ElevatedButton(
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(
-                                  Colors.blue.withOpacity(.5)),
+                              backgroundColor: WidgetStateProperty.all(
+                                  Colors.blue.withValues(alpha: .5)),
                             ),
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  AppLocalizations.of(context).totalDue,
+                                  AppLocalizations.of(context)!.totalDue,
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
                                       fontWeight: FontWeight.bold,
@@ -300,7 +271,7 @@ class DepositPaymentState extends State<DepositPayment> {
                     child: ListView.builder(
                         shrinkWrap: true,
                         physics: ClampingScrollPhysics(),
-                        itemCount: response2.data.length,
+                        itemCount: response2.data!.length,
                         itemBuilder: (BuildContext context, int index2) {
                           return Container(
                             margin: EdgeInsets.only(bottom: 10),
@@ -313,7 +284,7 @@ class DepositPaymentState extends State<DepositPayment> {
                                       child: Padding(
                                           padding: EdgeInsets.only(right: 20),
                                           child: Text(
-                                            "${response2.data[index2].date}",
+                                            "${response2.data![index2].date}",
                                             style: TextStyle(fontSize: 14),
                                             overflow: TextOverflow.ellipsis,
                                           )),
@@ -322,7 +293,7 @@ class DepositPaymentState extends State<DepositPayment> {
                                       child: Padding(
                                           padding: EdgeInsets.only(right: 20),
                                           child: Text(
-                                            "${response2.data[index2].deposited_amount}",
+                                            "${response2.data![index2].deposited_amount}",
                                             style: TextStyle(fontSize: 14),
                                           )),
                                     ),
@@ -351,7 +322,7 @@ class DepositPaymentState extends State<DepositPayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response2.data[index2].id}")),
+                                                    "${response2.data![index2].id}")),
                                           ],
                                         ),
                                       ),
@@ -367,7 +338,7 @@ class DepositPaymentState extends State<DepositPayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response2.data[index2].patient_id}")),
+                                                    "${response2.data![index2].patient_id}")),
                                           ],
                                         ),
                                       ),
@@ -383,7 +354,7 @@ class DepositPaymentState extends State<DepositPayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response2.data[index2].deposited_amount}")),
+                                                    "${response2.data![index2].deposited_amount}")),
                                           ],
                                         ),
                                       ),
@@ -399,7 +370,7 @@ class DepositPaymentState extends State<DepositPayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response2.data[index2].payment_id}")),
+                                                    "${response2.data![index2].payment_id}")),
                                           ],
                                         ),
                                       ),
@@ -415,7 +386,7 @@ class DepositPaymentState extends State<DepositPayment> {
                                             ),
                                             Flexible(
                                                 child: Text(
-                                                    "${response2.data[index2].date}")),
+                                                    "${response2.data![index2].date}")),
                                           ],
                                         ),
                                       ),
